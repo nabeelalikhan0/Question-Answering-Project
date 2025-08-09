@@ -21,6 +21,14 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
+class Contact(TimeStampedModel):
+    name = models.CharField(max_length=255)
+    email = models.EmailField(max_length=254)
+    phone = models.CharField(max_length=255)
+    message = models.TextField()
+
+
+
 class PreprocessText(TimeStampedModel):
     text = models.TextField(blank=True,null=True)
     file = models.FileField(upload_to='uploads/',blank=True,null=True)
@@ -28,3 +36,6 @@ class PreprocessText(TimeStampedModel):
 
     def __str__(self):
         return self.text[:50] if self.text else "No text"
+    
+
+    

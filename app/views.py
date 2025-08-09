@@ -14,6 +14,19 @@ import docx
 def index(request):
     return render(request,"index.html")
 
+def contact(request):
+    
+    if request.method == "POST":
+        form = forms.ContactForm(request.POST)
+        if form.is_valid:
+            form.save()
+
+    else:form = forms.ContactForm()
+
+    return render(request,"contact.html",{"form":form})
+
+
+
 def chatbot(request):
     form = forms.TextForm()
     file_text = request.session.get("file_text", None)

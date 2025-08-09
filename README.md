@@ -137,5 +137,4 @@ This project is licensed under the [MIT License](LICENSE).
 * Add streaming responses for real-time replies.
 * Enable multi-user sessions with authentication.
 
-```
 

@@ -22,3 +22,10 @@ class PreprocessTextAdmin(admin.ModelAdmin):
         return obj.text[:50] + ("..." if len(obj.text) > 50 else "")
 
     short_text.text = "Text"
+
+
+@admin.register(models.Contact)
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ["name",'email','phone']
+    list_filter = ["name",'email','phone']
+    search_fields = ["name",'email','phone']

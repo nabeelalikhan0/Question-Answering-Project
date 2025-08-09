@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Contact{% endblock title %}
+
+{% block main %}
+
+This is the contact Page
+
+
+<form action="" method="post">
+    <input type="hidden" name="csrfmiddlewaretoken" value="64YF1LqaAQO1sBvPkuEagJMKFJxbG4Ys6nWRQGmSY23wwnD3OHidXBXQxZTrCVYq">
+    <p>
+    <label for="id_name">Name:</label>
+    <input type="text" name="name" maxlength="255" required id="id_name">
+    
+    
+  </p>
+
+  
+  <p>
+    <label for="id_email">Email:</label>
+    <input type="email" name="email" maxlength="254" required id="id_email">
+    
+    
+  </p>
+
+  
+  <p>
+    <label for="id_phone">Phone:</label>
+    <input type="text" name="phone" maxlength="255" required id="id_phone">
+    
+    
+  </p>
+
+  
+  <p>
+    <label for="id_message">Message:</label>
+    <textarea name="message" cols="40" rows="10" required id="id_message">
+</textarea>
+    
+    
+      
+    
+  </p>
+    <button type="submit">Submit</button>
+    
+
+</form>
+
+{% endblock main %}

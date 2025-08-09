@@ -8,3 +8,9 @@ class TextForm(forms.ModelForm):
         model = models.PreprocessText
         fields = '__all__'
         exclude = ['file_text']
+
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = models.Contact
+        fields = "__all__"
