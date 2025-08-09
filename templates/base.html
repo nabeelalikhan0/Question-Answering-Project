@@ -1,27 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
-
+{% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% endblock title %} | RAS Q&A</title>
+    <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet">
     {% block head %}{% endblock head %}
 </head>
 
-<body>
+<body class="bg-gray-50 text-gray-900 flex flex-col min-h-screen">
 
-    <header>
-        <nav>
-            <ul>
-                <a href="/">Home</a>
-                <a href="/contact">Contact</a>
-                <a href="/chatbot">chatbot</a>
-
+    <!-- Navbar -->
+    <header class="bg-white shadow-md">
+        <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="text-xl font-bold text-blue-600">
+                <a href="/" class="hover:text-blue-800 transition">RAS Q&A</a>
+            </div>
+            <ul class="flex space-x-6 text-gray-700">
+                <li><a href="/" class="hover:text-blue-600 transition">Home</a></li>
+                <li><a href="/about" class="hover:text-blue-600 transition">About</a></li>
+                <li><a href="/contact" class="hover:text-blue-600 transition">Contact</a></li>
+                <li><a href="/chatbot" class="hover:text-blue-600 transition">Chatbot</a></li>
             </ul>
         </nav>
     </header>
 
-    {% block main %}{% endblock main %}
-</body>
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        {% block main %}{% endblock main %}
+    </main>
 
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 py-6 mt-8">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-sm">&copy; {{ now|date:"Y" }} RAS Q&A. All rights reserved.</p>
+            <div class="flex space-x-4 mt-4 md:mt-0">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
 </html>

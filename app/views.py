@@ -10,6 +10,8 @@ from .gemini import ask_gemini
 def index(request):
     return render(request, "index.html")
 
+def about(request):
+    return render(request,"about.html")
 
 # Contact Form
 def contact(request):

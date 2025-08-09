@@ -29,15 +29,24 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = [
     'app',
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
+    'tailwind',
+    'theme',  # Your Tailwind app
+    'django_browser_reload',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+]
+
+# Tell Django Tailwind which app to use
+TAILWIND_APP_NAME = 'theme'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
 ]
 
 MIDDLEWARE = [
@@ -127,3 +136,4 @@ import os
 
 MEDIA_URL = '/media/'  # URL for accessing files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Folder where files are stored
+NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"

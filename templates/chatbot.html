@@ -2,50 +2,76 @@
 {% block title %}Chatbot{% endblock title %}
 
 {% block main %}
-<h1>Chatbot</h1>
+<div class="max-w-3xl mx-auto flex flex-col h-[80vh] shadow-lg rounded-lg border border-gray-300 bg-white overflow-hidden">
 
-<!-- Upload Form -->
-<form action="" enctype="multipart/form-data" method="post" style="margin-bottom: 20px;">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Upload File</button>
-</form>
+  <header class="bg-blue-600 text-white p-4 text-center font-semibold text-xl">
+    Chatbot
+  </header>
 
-{% if file_text %}
-    <h2>Extracted Text:</h2>
-    <pre style="background-color: #f8f8f8; padding: 10px; border: 1px solid #ccc; white-space: pre-wrap;">
-{{ file_text }}
-    </pre>
-
-    <hr>
-
-    <!-- Chat Form -->
-    <form method="post" style="margin-top: 20px;">
-        {% csrf_token %}
-        <label for="message"><strong>Ask something:</strong></label>
-        <input type="text" name="message" id="message" style="width: 300px;">
-        <button type="submit">Send</button>
+  <!-- Upload file form -->
+  <section class="border-b border-gray-300 p-4 bg-white">
+    <form action="" enctype="multipart/form-data" method="post" class="flex items-center gap-3 mb-4">
+      {% csrf_token %}
+      {{ form.file }}
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+        Upload File
+      </button>
     </form>
-{% endif %}
 
-<!-- Show AI Response -->
-{% if ai_response %}
-    <div style="margin-top: 20px;">
-        <h3>Bot:</h3>
-        <p>{{ ai_response }}</p>
-    </div>
-{% endif %}
+    <!-- Show extracted file text if available -->
+    {% if file_text %}
+      <div class="max-h-32 overflow-auto bg-gray-100 p-3 rounded border border-gray-300 mb-4 whitespace-pre-wrap text-sm text-gray-700">
+        {{ file_text }}
+      </div>
+    {% endif %}
+  </section>
 
-<!-- Show Chat History -->
-{% if chat_history %}
-    <hr>
-    <h2>Conversation History</h2>
-    <div style="background: #f4f4f4; padding: 10px; border-radius: 5px;">
-        {% for chat in chat_history %}
-            <p><strong>You:</strong> {{ chat.user_message }}</p>
-            <p><strong>Bot:</strong> {{ chat.ai_response }}</p>
-            <hr>
-        {% endfor %}
-    </div>
-{% endif %}
+  <!-- Chat history area -->
+  <main id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+    {% if chat_history %}
+      {% for chat in chat_history %}
+        <div class="flex {% if forloop.counter0|divisibleby:2 %}justify-start{% else %}justify-end{% endif %}">
+          <!-- User messages left, bot right -->
+          {% if forloop.counter0|divisibleby:2 %}
+          <div class="bg-white p-3 rounded-lg max-w-[70%] shadow-md border border-gray-300">
+            <p class="text-gray-800 whitespace-pre-wrap">{{ chat.user_message }}</p>
+          </div>
+          {% else %}
+          <div class="bg-blue-600 text-white p-3 rounded-lg max-w-[70%] shadow-md">
+            <p class="whitespace-pre-wrap">{{ chat.ai_response }}</p>
+          </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-gray-500 text-center">Upload a file and start chatting!</p>
+    {% endif %}
+  </main>
+
+  <!-- Chat input form (only if file_text exists) -->
+  {% if file_text %}
+  <section class="border-t border-gray-300 p-4 bg-white">
+    <form action="" method="post" class="flex items-center gap-3">
+      {% csrf_token %}
+      <input type="text" name="message" id="message" placeholder="Type your message..." required
+        class="flex-grow border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+        Send
+      </button>
+    </form>
+  </section>
+  {% endif %}
+
+</div>
+
+<script>
+// Auto scroll chat history to bottom on page load
+window.onload = () => {
+  const chatHistory = document.getElementById('chat-history');
+  if (chatHistory) {
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+  }
+};
+</script>
+
 {% endblock main %}
