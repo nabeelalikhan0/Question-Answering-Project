@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}About Us{% endblock title %}
+
+{% load static %}
+{% block main %}
+<div class="max-w-5xl mx-auto px-4 py-12">
+
+  <!-- Project Info -->
+  <section class="mb-16">
+    <h1 class="text-4xl font-bold mb-4 text-center text-gray-900">About Our Project</h1>
+    <p class="text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto text-center">
+      Welcome to our advanced AI-powered Chatbot platform that integrates file upload and intelligent
+      conversational capabilities to assist users with contextual answers based on their uploaded documents.
+      This project leverages Django for backend robustness and Tailwind CSS for a modern responsive UI,
+      delivering a seamless user experience.
+    </p>
+    <p class="text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto mt-4 text-center">
+      Our goal is to provide a smart, efficient, and user-friendly assistant that helps users interact naturally,
+      enabling productive workflows and enhanced accessibility to information.
+    </p>
+  </section>
+
+  <!-- Team Section -->
+  <section>
+    <h2 class="text-3xl font-semibold mb-8 text-center text-gray-900">Meet the Team</h2>
+    <p class=" mb-10 text-center text-gray-700">Hover for details</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+
+      <!-- Team Member Card Template -->
+      <div class="relative group cursor-pointer rounded-lg overflow-hidden shadow-lg border border-gray-200 max-w-xs mx-auto">
+        <img src="/media/nabeel.jpg" alt="Nabeel Ali Khan"
+          class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110" />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-4 text-white text-center overflow-auto">
+          <h3 class="text-2xl font-semibold mb-1">Nabeel Ali Khan</h3>
+          <p class="text-sm mb-1 break-words"><strong>Email:</strong> nabeel.ali.private@gmail.com</p>
+          <p class="text-sm mb-1 break-words"><strong>Phone:</strong> +91 7424810385</p>
+          <p class="text-sm mb-1 break-words"><strong>UID:</strong> 24bai70830</p>
+          <p class="text-sm mb-4 break-words"><strong>Designation:</strong> Backend Developer (Group Leader)</p>
+          <div class="flex justify-center space-x-6 text-2xl">
+            <!-- Instagram -->
+            <a href="https://instagram.com/nabeelalikhan_" target="_blank" aria-label="Instagram"
+              class="text-pink-500 hover:text-pink-400 transition-colors duration-300">
+              <svg fill="currentColor" class="w-7 h-7" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M7.75 2A5.75 5.75 0 002 7.75v8.5A5.75 5.75 0 007.75 22h8.5A5.75 5.75 0 0022 16.25v-8.5A5.75 5.75 0 0016.25 2h-8.5zM12 7a5 5 0 110 10 5 5 0 010-10zm5.5-.5a1 1 0 110 2 1 1 0 010-2z" />
+              </svg>
+            </a>
+            <!-- LinkedIn -->
+            <a href="https://www.linkedin.com/in/nabeel-ali-khan-bb3138304" target="_blank" aria-label="LinkedIn"
+              class="text-blue-600 hover:text-blue-500 transition-colors duration-300">
+              <svg fill="currentColor" class="w-7 h-7" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M4.98 3.5a2.5 2.5 0 11.02 5 2.5 2.5 0 01-.02-5zM3 9h4v12H3zM9 9h3.68v1.71h.05c.51-.96 1.76-1.97 3.62-1.97 3.87 0 4.59 2.54 4.59 5.85V21H16v-5.6c0-1.34-.03-3.06-1.87-3.06-1.87 0-2.16 1.46-2.16 2.97V21H9z" />
+              </svg>
+            </a>
+            <!-- GitHub -->
+            <a href="https://github.com/nabeelalikhan0" target="_blank" aria-label="GitHub"
+              class="text-gray-700 hover:text-gray-500 transition-colors duration-300">
+              <svg fill="currentColor" class="w-7 h-7" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M12 2C6.48 2 2 6.48 2 12c0 4.42 2.87 8.17 6.84 9.5.5.09.68-.22.68-.5v-1.8c-2.78.6-3.37-1.34-3.37-1.34-.45-1.14-1.1-1.44-1.1-1.44-.9-.62.07-.6.07-.6 1 .07 1.54 1.04 1.54 1.04.9 1.54 2.36 1.1 2.94.85.09-.66.35-1.1.63-1.35-2.22-.25-4.55-1.11-4.55-4.93 0-1.1.4-2 .1-2.8 0 0 .84-.27 2.75 1.05a9.57 9.57 0 012.5-.34c.85 0 1.7.1 2.5.34 1.9-1.32 2.74-1.05 2.74-1.05.5.8.1 1.7.05 2.8 0 3.83-2.35 4.68-4.6 4.92.37.32.7.94.7 1.9v2.81c0 .28.2.6.7.5A10.013 10.013 0 0022 12c0-5.52-4.48-10-10-10z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <p class="text-center mt-2 font-medium text-gray-800">Nabeel Ali Khan</p>
+      </div>
+
+      <!-- Repeat above block for other 3 members, just change the content and images -->
+      <div class="relative group cursor-pointer rounded-lg overflow-hidden shadow-lg border border-gray-200 max-w-xs mx-auto">
+        <img src="/media/gitika.jpeg" alt="Member 2"
+          class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110" />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-4 text-white text-center overflow-auto">
+          <h3 class="text-2xl font-semibold mb-1">Gitika </h3>
+          <p class="text-sm mb-1 break-words"><strong>Email:</strong> dhingragitika11@gmail.com</p>
+          <p class="text-sm mb-1 break-words"><strong>Phone:</strong> +91 9996612448</p>
+          <p class="text-sm mb-1 break-words"><strong>UID:</strong> 24bai70574</p>
+          <p class="text-sm mb-4 break-words"><strong>Designation:</strong> Frontend Developer</p>
+          <div class="flex justify-center space-x-6 text-2xl">
+            <a href="#" target="_blank" aria-label="Instagram"
+              class="text-pink-500 hover:text-pink-400 transition-colors duration-300">
+              <!-- Instagram SVG same as above -->
+            </a>
+            <a href="#" target="_blank" aria-label="LinkedIn"
+              class="text-blue-600 hover:text-blue-500 transition-colors duration-300">
+              <!-- LinkedIn SVG -->
+            </a>
+            <a href="#" target="_blank" aria-label="GitHub"
+              class="text-gray-700 hover:text-gray-500 transition-colors duration-300">
+              <!-- GitHub SVG -->
+            </a>
+          </div>
+        </div>
+        <p class="text-center mt-2 font-medium text-gray-800">Gitika</p>
+      </div>
+
+      <!-- Member 3 -->
+      <div class="relative group cursor-pointer rounded-lg overflow-hidden shadow-lg border border-gray-200 max-w-xs mx-auto">
+        <img src="/media/nabeel.jpg" alt="Member 3"
+          class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110" />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-4 text-white text-center overflow-auto">
+          <h3 class="text-2xl font-semibold mb-1">Member Three</h3>
+          <p class="text-sm mb-1 break-words"><strong>Email:</strong> member3@example.com</p>
+          <p class="text-sm mb-1 break-words"><strong>Phone:</strong> +91 9876543210</p>
+          <p class="text-sm mb-1 break-words"><strong>UID:</strong> UID003</p>
+          <p class="text-sm mb-4 break-words"><strong>Designation:</strong> AI Specialist</p>
+          <div class="flex justify-center space-x-6 text-2xl">
+            <a href="#" target="_blank" aria-label="Instagram"
+              class="text-pink-500 hover:text-pink-400 transition-colors duration-300">
+              <!-- Instagram SVG -->
+            </a>
+            <a href="#" target="_blank" aria-label="LinkedIn"
+              class="text-blue-600 hover:text-blue-500 transition-colors duration-300">
+              <!-- LinkedIn SVG -->
+            </a>
+            <a href="#" target="_blank" aria-label="GitHub"
+              class="text-gray-700 hover:text-gray-500 transition-colors duration-300">
+              <!-- GitHub SVG -->
+            </a>
+          </div>
+        </div>
+        <p class="text-center mt-2 font-medium text-gray-800">Member Three</p>
+      </div>
+
+      <!-- Member 4 -->
+      <div class="relative group cursor-pointer rounded-lg overflow-hidden shadow-lg border border-gray-200 max-w-xs mx-auto">
+        <img src="/media/nabeel.jpg" alt="Member 4"
+          class="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110" />
+        <div
+          class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-4 text-white text-center overflow-auto">
+          <h3 class="text-2xl font-semibold mb-1">Member Four</h3>
+          <p class="text-sm mb-1 break-words"><strong>Email:</strong> member4@example.com</p>
+          <p class="text-sm mb-1 break-words"><strong>Phone:</strong> +91 1112223334</p>
+          <p class="text-sm mb-1 break-words"><strong>UID:</strong> UID004</p>
+          <p class="text-sm mb-4 break-words"><strong>Designation:</strong> UX Designer</p>
+          <div class="flex justify-center space-x-6 text-2xl">
+            <a href="#" target="_blank" aria-label="Instagram"
+              class="text-pink-500 hover:text-pink-400 transition-colors duration-300">
+              <!-- Instagram SVG -->
+            </a>
+            <a href="#" target="_blank" aria-label="LinkedIn"
+              class="text-blue-600 hover:text-blue-500 transition-colors duration-300">
+              <!-- LinkedIn SVG -->
+            </a>
+            <a href="#" target="_blank" aria-label="GitHub"
+              class="text-gray-700 hover:text-gray-500 transition-colors duration-300">
+              <!-- GitHub SVG -->
+            </a>
+          </div>
+        </div>
+        <p class="text-center mt-2 font-medium text-gray-800">Member Four</p>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+{% endblock main %}
