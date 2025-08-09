@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block main %}
+<h1>Chatbot</h1>
+
+<!-- Upload form -->
+<form action="" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Upload File</button>
+</form>
+
+{% if file_text %}
+    <h2>Extracted Text:</h2>
+    <pre>{{ file_text }}</pre>
+
+    <hr>
+    <!-- Chat form -->
+    <form method="post">
+        {% csrf_token %}
+        <label>Ask something:</label>
+        <input type="text" name="message" style="width: 300px;">
+        <button type="submit">Send</button>
+    </form>
+{% endif %}
+
+{% if ai_response %}
+    <h3>Bot:</h3>
+    <p>{{ ai_response }}</p>
+{% endif %}
+
+{% endblock main %}

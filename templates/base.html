@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock title %} | RAS Q&A</title>
+    {% block head %}{% endblock head %}
+</head>
+
+<body>
+
+    <header>
+        <nav>
+            <ul>
+                <a href="/">Home</a>
+                <a href="/chatbot">chatbot</a>
+
+            </ul>
+        </nav>
+    </header>
+
+    {% block main %}{% endblock main %}
+</body>
+
+</html>
