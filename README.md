@@ -1,7 +1,6 @@
 
 ---
 
-````markdown
 # 📄 File-Based Chatbot with Google Gemini
 
 This project is a Django web application that allows you to **upload a file** (TXT, PDF, DOCX), extract its text, and then **chat with a chatbot** powered by **Google Gemini** — with the conversation based entirely on the uploaded file’s content.
@@ -36,7 +35,7 @@ This project is a Django web application that allows you to **upload a file** (T
    ```bash
    git clone https://github.com/yourusername/gemini-file-chatbot.git
    cd gemini-file-chatbot
-````
+
 
 2. **Create and activate a virtual environment**
 
