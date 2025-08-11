@@ -1,77 +1,96 @@
 {% extends "base.html" %}
 {% block title %}Chatbot{% endblock title %}
+{% load static %}
+{% load widget_tweaks %}
 
-{% block main %}
-<div class="max-w-3xl mx-auto flex flex-col h-[80vh] shadow-lg rounded-lg border border-gray-300 bg-white overflow-hidden">
+{% block content %}
+<!-- Outer Background -->
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-500 to-pink-500 relative overflow-hidden p-4">
 
-  <header class="bg-blue-600 text-white p-4 text-center font-semibold text-xl">
-    Chatbot
-  </header>
+  <!-- Decorative background accents -->
+  <div class="absolute top-0 left-0 w-72 h-72 bg-pink-400/30 rounded-full blur-3xl animate-pulse"></div>
+  <div class="absolute bottom-0 right-0 w-96 h-96 bg-indigo-400/30 rounded-full blur-3xl animate-pulse delay-2000"></div>
 
-  <!-- Upload file form -->
-  <section class="border-b border-gray-300 p-4 bg-white">
-    <form action="" enctype="multipart/form-data" method="post" class="flex items-center gap-3 mb-4">
-      {% csrf_token %}
-      {{ form.file }}
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-        Upload File
-      </button>
-    </form>
+  <!-- Main Card -->
+  <div class="relative w-full max-w-4xl flex flex-col h-[85vh] backdrop-blur-2xl bg-white/10 dark:bg-gray-900/40 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.3)] border border-white/20 overflow-hidden">
 
-    <!-- Show extracted file text if available -->
-    {% if file_text %}
-      <div class="max-h-32 overflow-auto bg-gray-100 p-3 rounded border border-gray-300 mb-4 whitespace-pre-wrap text-sm text-gray-700">
-        {{ file_text }}
-      </div>
-    {% endif %}
-  </section>
+    <!-- Header -->
+    <header class="text-white font-semibold text-2xl text-center py-4 bg-gradient-to-r from-pink-500/90 via-purple-500/90 to-indigo-500/90 shadow-lg tracking-wide">
+      RAG Question Answering System
+    </header>
 
-  <!-- Chat history area -->
-  <main id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
-    {% if chat_history %}
-      {% for chat in chat_history %}
-        <div class="flex {% if forloop.counter0|divisibleby:2 %}justify-start{% else %}justify-end{% endif %}">
-          <!-- User messages left, bot right -->
+    <!-- Upload Form -->
+    <section class="p-4 border-b border-white/20">
+      <form action="" enctype="multipart/form-data" method="post" class="flex flex-col sm:flex-row gap-3">
+        {% csrf_token %}
+        {{ form.file|add_class:"flex-grow text-sm text-white border border-white/40 rounded-lg bg-white/10 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" }}
+        <button type="submit" class="px-5 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium shadow hover:scale-105 hover:opacity-90 transition">
+          Upload
+        </button>
+      </form>
+
+      {% if file_text %}
+        <div class="mt-4 max-h-28 overflow-auto text-sm p-3 rounded-lg bg-white/10 text-white border border-white/20 whitespace-pre-wrap">
+          {{ file_text }}
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- Chat History -->
+    <main id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4">
+      {% if chat_history %}
+        {% for chat in chat_history %}
           {% if forloop.counter0|divisibleby:2 %}
-          <div class="bg-white p-3 rounded-lg max-w-[70%] shadow-md border border-gray-300">
-            <p class="text-gray-800 whitespace-pre-wrap">{{ chat.user_message }}</p>
+          <!-- User Message -->
+          <div class="flex justify-start">
+            <div class="bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-200 px-4 py-2 rounded-2xl shadow max-w-[75%]">
+              {{ chat.user_message }}
+            </div>
           </div>
           {% else %}
-          <div class="bg-blue-600 text-white p-3 rounded-lg max-w-[70%] shadow-md">
-            <p class="whitespace-pre-wrap">{{ chat.ai_response }}</p>
+          <!-- AI Response -->
+          <div class="flex justify-end">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-2xl shadow max-w-[75%]">
+              {{ chat.ai_response }}
+            </div>
           </div>
           {% endif %}
-        </div>
-      {% endfor %}
-    {% else %}
-      <p class="text-gray-500 text-center">Upload a file and start chatting!</p>
+        {% endfor %}
+      {% else %}
+        <p class="text-white/80 text-center">Upload a file and start chatting!</p>
+      {% endif %}
+    </main>
+
+    <!-- Chat Input -->
+    {% if file_text %}
+    <section class="border-t border-white/20 p-4 bg-white/10">
+      <form action="" method="post" class="flex items-center gap-3">
+        {% csrf_token %}
+        <input type="text" name="message" id="message" placeholder="Type your question..." required
+          class="flex-grow rounded-full px-5 py-2 border border-white/30 bg-white/10 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-pink-400" />
+
+        <!-- Send -->
+        <button type="submit" class="rounded-full px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow hover:scale-105 transition">
+          Send
+        </button>
+
+        <!-- Mic -->
+        <button type="button" class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg hover:scale-110 transition" title="Ask via voice">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-white" viewBox="0 0 24 24">
+            <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z" />
+            <path d="M19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.92V21h-3a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-3.08A7 7 0 0 0 19 11z" />
+          </svg>
+        </button>
+      </form>
+    </section>
     {% endif %}
-  </main>
-
-  <!-- Chat input form (only if file_text exists) -->
-  {% if file_text %}
-  <section class="border-t border-gray-300 p-4 bg-white">
-    <form action="" method="post" class="flex items-center gap-3">
-      {% csrf_token %}
-      <input type="text" name="message" id="message" placeholder="Type your message..." required
-        class="flex-grow border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-        Send
-      </button>
-    </form>
-  </section>
-  {% endif %}
-
+  </div>
 </div>
 
 <script>
-// Auto scroll chat history to bottom on page load
 window.onload = () => {
   const chatHistory = document.getElementById('chat-history');
-  if (chatHistory) {
-    chatHistory.scrollTop = chatHistory.scrollHeight;
-  }
+  if (chatHistory) chatHistory.scrollTop = chatHistory.scrollHeight;
 };
 </script>
-
-{% endblock main %}
+{% endblock content %}

@@ -3,18 +3,62 @@
 
 {% block title %}Home{% endblock title %}
 
-{% block main %}
+{% block head %}
+<style>
+    /* Greek pattern background for hero */
+    .greek-hero {
+        background-image: linear-gradient(135deg, #005f73, #0a9396, #94d2bd, #ee9b00, #ca6702, #bb3e03, #ae2012);
+        background-size: 400% 400%;
+        animation: gradientShift 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+
+    /* Gold shimmer for headings */
+    .gold-text {
+        background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: shimmer 3s infinite linear;
+        background-size: 200% auto;
+    }
+
+    @keyframes shimmer {
+        to { background-position: 200% center; }
+    }
+
+    /* Marble card effect */
+    .marble {
+        background-image: url('https://www.transparenttextures.com/patterns/marble.png');
+        background-color: #fdfaf6;
+        background-size: cover;
+    }
+
+    /* Ancient scroll effect */
+    .scroll-bg {
+        background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+        background-color: #fdf3e7;
+    }
+</style>
+{% endblock head %}
+
+{% block content %}
 <!-- Hero Section -->
-<section class="text-center bg-white dark:bg-gray-800 p-8 md:p-12 rounded-lg shadow-lg">
+<section class="greek-hero text-center p-8 md:p-12 rounded-lg shadow-xl relative overflow-hidden">
     <div class="max-w-4xl mx-auto">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-blue-600 dark:text-blue-400 mb-4">
+        <h1 class="text-5xl md:text-6xl font-extrabold gold-text drop-shadow-lg mb-4">
             Welcome to RAS Q&A
         </h1>
-        <p class="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-8">
-            Your intelligent resource for getting clear, concise answers to your most pressing questions. Powered by advanced AI, we're here to help you learn and discover.
+        <p class="text-lg md:text-xl text-white font-semibold drop-shadow-md mb-8">
+            Your intelligent resource for clear, concise answers — inspired by the wisdom of the ancients.
         </p>
-        <a href="/chatbot" class="inline-block bg-blue-600 text-white font-bold py-3 px-8 rounded-full hover:bg-blue-700 transition-transform transform hover:scale-105 shadow-md">
-            Ask a Question Now
+        <a href="/chatbot"
+           class="inline-block bg-yellow-400 text-gray-900 font-bold py-3 px-8 rounded-full hover:bg-yellow-300 hover:scale-105 transform transition-all shadow-lg border-2 border-yellow-600">
+            ⚡ Ask a Question Now
         </a>
     </div>
 </section>
@@ -22,79 +66,76 @@
 <!-- Features Section -->
 <section class="py-12 md:py-20">
     <div class="text-center mb-12">
-        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Why Choose Us?</h2>
-        <p class="text-gray-500 dark:text-gray-400 mt-2">Discover the features that make RAS Q&A the best place for answers.</p>
+        <h2 class="text-4xl font-bold gold-text drop-shadow-md">Why Choose Us?</h2>
+        <p class="text-gray-600 mt-2 italic">Wisdom worth its weight in gold.</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         <!-- Feature 1 -->
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
-            <div class="flex items-center justify-center h-16 w-16 bg-blue-100 dark:bg-blue-900 rounded-full mx-auto mb-4">
-                <!-- SVG Icon: Lightbulb for "Instant Answers" -->
-                <svg class="h-6 w-6 text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        <div class="marble p-8 rounded-lg shadow-xl text-center border-4 border-yellow-600 hover:scale-105 transition-transform">
+            <div class="flex items-center justify-center h-16 w-16 bg-yellow-100 rounded-full mx-auto mb-4 border-2 border-yellow-500 shadow-md">
+                <svg class="h-6 w-6 text-yellow-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Instant Answers</h3>
-            <p class="text-gray-600 dark:text-gray-300">
-                Leverage our powerful AI chatbot to get immediate and accurate responses to your queries, anytime.
+            <h3 class="text-xl font-bold gold-text mb-2">Instant Answers</h3>
+            <p class="text-gray-700 font-medium">
+                Get responses in a flash, like a message from the Oracle.
             </p>
         </div>
         <!-- Feature 2 -->
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
-            <div class="flex items-center justify-center h-16 w-16 bg-green-100 dark:bg-green-900 rounded-full mx-auto mb-4">
-                <!-- SVG Icon: Book for "Comprehensive Knowledge" -->
-                <svg class="h-6 w-6 text-green-600 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        <div class="marble p-8 rounded-lg shadow-xl text-center border-4 border-green-600 hover:scale-105 transition-transform">
+            <div class="flex items-center justify-center h-16 w-16 bg-green-100 rounded-full mx-auto mb-4 border-2 border-green-500 shadow-md">
+                <svg class="h-6 w-6 text-green-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Comprehensive Knowledge</h3>
-            <p class="text-gray-600 dark:text-gray-300">
-                Our platform is built on a vast and diverse knowledge base, ensuring you get well-rounded information.
+            <h3 class="text-xl font-bold gold-text mb-2">Comprehensive Knowledge</h3>
+            <p class="text-gray-700 font-medium">
+                Like the Library of Alexandria, but in your pocket.
             </p>
         </div>
         <!-- Feature 3 -->
-        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md text-center hover:shadow-xl transition-shadow">
-            <div class="flex items-center justify-center h-16 w-16 bg-purple-100 dark:bg-purple-900 rounded-full mx-auto mb-4">
-                <!-- SVG Icon: Users for "Community Driven" -->
-                <svg class="h-6 w-6 text-purple-600 dark:text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        <div class="marble p-8 rounded-lg shadow-xl text-center border-4 border-purple-600 hover:scale-105 transition-transform">
+            <div class="flex items-center justify-center h-16 w-16 bg-purple-100 rounded-full mx-auto mb-4 border-2 border-purple-500 shadow-md">
+                <svg class="h-6 w-6 text-purple-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Easy to Use</h3>
-            <p class="text-gray-600 dark:text-gray-300">
-                With a clean and intuitive interface, finding the information you need has never been simpler.
+            <h3 class="text-xl font-bold gold-text mb-2">Easy to Use</h3>
+            <p class="text-gray-700 font-medium">
+                Clean, simple, and built for philosophers and thinkers alike.
             </p>
         </div>
     </div>
 </section>
 
 <!-- Recent Questions Section -->
-<section class="bg-gray-100 dark:bg-gray-900 py-12 md:py-20 rounded-lg">
+<section class="scroll-bg py-12 md:py-20 rounded-lg shadow-lg">
     <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white">Recent Questions</h2>
-            <p class="text-gray-500 dark:text-gray-400 mt-2">See what others are asking.</p>
+            <h2 class="text-4xl font-bold gold-text drop-shadow-md">Recent Questions</h2>
+            <p class="text-gray-700 italic">See what the agora is discussing.</p>
         </div>
         <div class="space-y-4 max-w-3xl mx-auto">
-            <!-- Example Question 1 -->
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-center space-x-4">
-                <span class="text-blue-500">Q:</span>
-                <p class="text-gray-700 dark:text-gray-200 flex-grow">What are the main principles of Recurrent Neural Networks?</p>
-                <a href="/chatbot" class="text-blue-600 hover:underline text-sm font-semibold">View Answer</a>
+            <div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-4 hover:scale-[1.02] transition-transform border-l-4 border-blue-500">
+                <span class="text-blue-500 font-bold">Q:</span>
+                <p class="text-gray-800 flex-grow">What are the main principles of Recurrent Neural Networks?</p>
+                <a href="/chatbot" class="text-blue-700 hover:underline text-sm font-semibold">View Answer</a>
             </div>
-            <!-- Example Question 2 -->
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-center space-x-4">
-                <span class="text-blue-500">Q:</span>
-                <p class="text-gray-700 dark:text-gray-200 flex-grow">How does photosynthesis work in plants?</p>
-                <a href="/chatbot" class="text-blue-600 hover:underline text-sm font-semibold">View Answer</a>
+            <div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-4 hover:scale-[1.02] transition-transform border-l-4 border-green-500">
+                <span class="text-green-500 font-bold">Q:</span>
+                <p class="text-gray-800 flex-grow">How does photosynthesis work in plants?</p>
+                <a href="/chatbot" class="text-green-700 hover:underline text-sm font-semibold">View Answer</a>
             </div>
-            <!-- Example Question 3 -->
-            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-center space-x-4">
-                <span class="text-blue-500">Q:</span>
-                <p class="text-gray-700 dark:text-gray-200 flex-grow">Can you explain the theory of relativity in simple terms?</p>
-                <a href="/chatbot" class="text-blue-600 hover:underline text-sm font-semibold">View Answer</a>
+            <div class="bg-white p-4 rounded-lg shadow-md flex items-center space-x-4 hover:scale-[1.02] transition-transform border-l-4 border-purple-500">
+                <span class="text-purple-500 font-bold">Q:</span>
+                <p class="text-gray-800 flex-grow">Can you explain the theory of relativity in simple terms?</p>
+                <a href="/chatbot" class="text-purple-700 hover:underline text-sm font-semibold">View Answer</a>
             </div>
         </div>
     </div>
 </section>
-{% endblock main %}
+{% endblock content %}

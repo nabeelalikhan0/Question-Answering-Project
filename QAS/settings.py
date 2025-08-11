@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'app',
     'tailwind',
     'theme',  # Your Tailwind app
+    'widget_tweaks',
     'django_browser_reload',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -124,7 +125,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -137,3 +137,18 @@ import os
 MEDIA_URL = '/media/'  # URL for accessing files
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Folder where files are stored
 NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"
+
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# URL to use when referring to static files
+STATIC_URL = '/static/'
+
+# Directory where Django will collect all static files when you run `collectstatic`
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # used for production
+
+# Additional directories for static files (during development)
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # your own static folder
+]
