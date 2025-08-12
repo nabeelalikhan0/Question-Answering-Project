@@ -30,13 +30,12 @@ class Contact(TimeStampedModel):
         return self.name
 
 
-class PreprocessText(TimeStampedModel):
-    text = models.TextField(blank=True, null=True)
-    file = models.FileField(upload_to='uploads/', blank=True, null=True, validators=[validate_file_type])
+class PreprocessText(models.Model):
+    session_id = models.CharField(max_length=255, default='default_session')
+    file = models.FileField(upload_to="uploads/",blank=True, null=True)
     file_text = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.text[:50] if self.text else "No text"
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class ChatHistory(models.Model):
@@ -49,3 +48,7 @@ class ChatHistory(models.Model):
     def __str__(self):
         return f"{self.created_at} - {self.user_message[:50]}"
 
+class subscribers(TimeStampedModel):
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    email = models.EmailField(max_length=255,blank=True,null=True)
+    

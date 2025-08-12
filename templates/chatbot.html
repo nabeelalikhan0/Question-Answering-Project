@@ -4,15 +4,41 @@
 {% load widget_tweaks %}
 
 {% block content %}
-<!-- Outer Background -->
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-600 via-purple-500 to-pink-500 relative overflow-hidden p-4">
+<div class="min-h-screen flex bg-gradient-to-br from-indigo-600 via-purple-500 to-pink-500">
 
-  <!-- Decorative background accents -->
-  <div class="absolute top-0 left-0 w-72 h-72 bg-pink-400/30 rounded-full blur-3xl animate-pulse"></div>
-  <div class="absolute bottom-0 right-0 w-96 h-96 bg-indigo-400/30 rounded-full blur-3xl animate-pulse delay-2000"></div>
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white/20 backdrop-blur-lg p-4 border-r border-white/30 overflow-y-auto">
+    <h2 class="text-white font-semibold mb-4">Previous Chats</h2>
 
-  <!-- Main Card -->
-  <div class="relative w-full max-w-4xl flex flex-col h-[85vh] backdrop-blur-2xl bg-white/10 dark:bg-gray-900/40 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.3)] border border-white/20 overflow-hidden">
+    <!-- Search Bar -->
+    <form method="get" action="" class="mb-4">
+      <input type="text" name="search" value="{{ search_query }}"
+        placeholder="Search chats..."
+        class="w-full px-3 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-pink-400" />
+      <button type="submit"
+        class="mt-2 w-full px-3 py-2 rounded-lg bg-pink-500 text-white hover:bg-pink-600 transition">
+        Search
+      </button>
+    </form>
+
+    {% if previous_sessions %}
+      <ul class="space-y-2">
+        {% for session in previous_sessions %}
+          <li>
+            <a href="?session_id={{ session.session_id }}"
+               class="block px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition">
+              Chat on {{ session.last_message_time|date:"M d, Y H:i" }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-white/70 text-sm">No previous chats</p>
+    {% endif %}
+  </aside>
+
+  <!-- Main Chat Area -->
+  <div class="flex-1 flex flex-col h-screen overflow-hidden">
 
     <!-- Header -->
     <header class="text-white font-semibold text-2xl text-center py-4 bg-gradient-to-r from-pink-500/90 via-purple-500/90 to-indigo-500/90 shadow-lg tracking-wide">
@@ -40,15 +66,15 @@
     <main id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4">
       {% if chat_history %}
         {% for chat in chat_history %}
-          {% if forloop.counter0|divisibleby:2 %}
           <!-- User Message -->
           <div class="flex justify-start">
             <div class="bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-200 px-4 py-2 rounded-2xl shadow max-w-[75%]">
               {{ chat.user_message }}
             </div>
           </div>
-          {% else %}
+
           <!-- AI Response -->
+          {% if chat.ai_response %}
           <div class="flex justify-end">
             <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-2xl shadow max-w-[75%]">
               {{ chat.ai_response }}
@@ -72,14 +98,6 @@
         <!-- Send -->
         <button type="submit" class="rounded-full px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow hover:scale-105 transition">
           Send
-        </button>
-
-        <!-- Mic -->
-        <button type="button" class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg hover:scale-110 transition" title="Ask via voice">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-white" viewBox="0 0 24 24">
-            <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z" />
-            <path d="M19 11a1 1 0 0 0-2 0 5 5 0 0 1-10 0 1 1 0 0 0-2 0 7 7 0 0 0 6 6.92V21h-3a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-3.08A7 7 0 0 0 19 11z" />
-          </svg>
         </button>
       </form>
     </section>
