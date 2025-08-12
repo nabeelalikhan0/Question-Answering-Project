@@ -35,3 +35,10 @@ class ChatHistoryAdmin(admin.ModelAdmin):
     list_display = ["user","session_id", "user_message", "ai_response", "created_at"]
     search_fields = ["user_message", "ai_response", "session_id"]
     list_filter = ["created_at"]
+
+
+@admin.register(models.subscribers)
+class SubscribersAdmin(admin.ModelAdmin):
+    list_display = ["user","email"]
+    list_filter = ["created_at"]
+    search_fields = ['user','email']

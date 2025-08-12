@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Subscribe{% endblock title %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[70vh] px-4">
+    <div class="greek-border max-w-lg w-full p-8 bg-[var(--greek-blue)]/30 rounded-2xl shadow-lg text-center">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto mb-4 text-[var(--greek-gold)]" width="60" height="60" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M16 2a2 2 0 0 1-2 2h-2.586l-1.707 1.707a1 1 0 0 1-1.414 0L6.586 4H4a2 2 0 1 1 0-4h8a2 2 0 0 1 2 2z"/>
+            <path fill-rule="evenodd" d="M0 4a2 2 0 0 1 2-2h1.586l1.707 1.707a1 1 0 0 0 1.414 0L8.414 2H14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9v2h1a1 1 0 1 1 0 2H6a1 1 0 1 1 0-2h1v-2H2a2 2 0 0 1-2-2V4zm8 8a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+        </svg>
+
+        <h1 class="text-3xl font-bold text-[var(--greek-gold)] mb-3">Subscription Confirmed!</h1>
+        <p class="text-white/90 text-lg leading-relaxed">
+            Thank you for subscribing to <span class="font-semibold text-[var(--greek-gold)]">RAGQA</span>.  
+            You’ll now receive the latest updates, tips, and insights directly in your inbox.
+        </p>
+
+        <div class="mt-6">
+            <a href="{% url 'index' %}" 
+               class="inline-block px-6 py-3 bg-[var(--greek-gold)] text-[var(--greek-blue)] font-bold rounded-md hover:bg-yellow-400 transition">
+               Go to Homepage
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
