@@ -1,0 +1,68 @@
+:root {
+    --greek-blue: #1a4b84;
+    --greek-gold: #d4af37;
+}
+
+.greek-title {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.text-greek-blue {
+    color: var(--greek-blue);
+}
+
+.text-greek-gold {
+    color: var(--greek-gold);
+}
+
+.border-greek-blue {
+    border-color: var(--greek-blue);
+}
+
+.border-greek-gold {
+    border-color: var(--greek-gold);
+}
+
+/* Marble background class */
+.bg-marble {
+    background: url('../images/marble-texture.jpg') center/cover no-repeat;
+}
+
+/* Gold shimmer animation */
+@keyframes gold-shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: 200px 0; }
+}
+
+.shimmer-gold {
+    background: linear-gradient(
+        90deg,
+        var(--greek-gold) 0%,
+        #fff5cc 50%,
+        var(--greek-gold) 100%
+    );
+    background-size: 200% auto;
+    color: #fff;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gold-shimmer 3s linear infinite;
+}
+
+/* Parchment panel */
+.bg-parchment {
+    background: #fdf6e3 url('../images/parchment-texture.jpg') center/cover no-repeat;
+}
+
+/* Hover glow */
+.hover-glow:hover {
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.7);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .greek-title {
+        font-size: 1.8rem;
+    }
+}

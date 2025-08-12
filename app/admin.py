@@ -32,6 +32,6 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(models.ChatHistory)
 class ChatHistoryAdmin(admin.ModelAdmin):
-    list_display = ["session_id", "user_message", "ai_response", "created_at"]
+    list_display = ["user","session_id", "user_message", "ai_response", "created_at"]
     search_fields = ["user_message", "ai_response", "session_id"]
     list_filter = ["created_at"]

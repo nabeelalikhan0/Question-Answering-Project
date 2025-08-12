@@ -1,12 +1,28 @@
 import os
 import PyPDF2
 import docx
-from django.shortcuts import render
+from django.shortcuts import render,redirect,HttpResponse
+from django.core.mail import send_mail
 from . import models, forms
 from .gemini import ask_gemini
+from django.contrib.auth.forms import UserCreationForm
+from .forms import StyledSignupForm, StyledLoginForm
+from django.contrib.auth.views import LoginView
 
 
 # Home Page
+def send_email(email,subject,message):
+    recipient_list = [email]
+    send_mail(
+        subject=subject,
+        message=message,
+        from_email='nabeelalikhan314@gmail.com',
+        recipient_list=recipient_list,
+        fail_silently=False,
+    )
+    return HttpResponse("Message Sent! Successfully")
+
+
 def index(request):
     return render(request, "index.html")
 
@@ -67,6 +83,7 @@ def chatbot(request):
 
                 # Save chat in DB per session
                 models.ChatHistory.objects.create(
+                    user=request.user,
                     session_id=request.session.session_key,
                     user_message=user_message,
                     ai_response=ai_response
@@ -83,3 +100,21 @@ def chatbot(request):
         "ai_response": ai_response,
         "chat_history": chat_history
     })
+
+
+
+def signup(request):
+    if request.method == "POST":
+        form = StyledSignupForm(request.POST)
+        if form.is_valid():
+            form.save()
+            send_email(request.user.email,"Thanks for joing RAGQA","Welcome to RAGQA! We're glad to have you here.")
+            return redirect('login')
+    else:
+        form = StyledSignupForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+
+class CustomLoginView(LoginView):
+    authentication_form = StyledLoginForm
+    template_name = "registration/login.html"
