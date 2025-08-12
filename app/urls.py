@@ -1,5 +1,7 @@
 from django.urls import path
 from . import views
+from django.contrib.auth.views import LogoutView
+from django.contrib import admin
 
 urlpatterns = [
     path("",views.index,name="Index"),
@@ -8,5 +10,14 @@ urlpatterns = [
     path("chatbot",views.chatbot,name="chatbot"),
     # path("chatbot/chat/",views.chatbot_chat,name="chatbot_chat")
 
+    path('signup/', views.signup, name='signup'),
+    path('login/', views.CustomLoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(next_page='index'), name='logout'),
+
 
 ]
+
+
+admin.site.site_header = "RAG Q&A" 
+admin.site.site_title = "RAG Question and Answering System"
+admin.site.index_title = "Welcome to RAG Q&A"

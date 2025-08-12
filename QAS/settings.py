@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'tailwind',
     'theme',  # Your Tailwind app
     'widget_tweaks',
+       'jazzmin',
     'django_browser_reload',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -152,3 +153,14 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'  # used for production
 STATICFILES_DIRS = [
     BASE_DIR / 'static',  # your own static folder
 ]
+
+
+LOGIN_REDIRECT_URL = '/'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'nabeelalikhan314@gmail.com'
+EMAIL_HOST_PASSWORD = 'fbri ovte syqp ulgh' #password associated with above email-id (not the regular password)

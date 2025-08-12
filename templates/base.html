@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 {% load static %}
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,33 +18,61 @@
       --greek-gold: #d4af37;
       --marble-dark: linear-gradient(180deg, #0b1a36 0%, #142a50 100%);
     }
+
     .marble-bg {
       background: var(--marble-dark);
       background-blend-mode: overlay;
       color-scheme: dark;
     }
+
     .greek-border {
       position: relative;
       padding: 1.25rem;
       border-radius: 1rem;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(245,249,255,0.05));
-      border: 1px solid rgba(212,175,55,0.15);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(245, 249, 255, 0.05));
+      border: 1px solid rgba(212, 175, 55, 0.15);
       overflow: hidden;
     }
+
     .gold-shimmer {
-      background-image: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0.25), rgba(255,255,255,0.05));
+      background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.05));
       background-size: 200% 100%;
       animation: shimmer 3.5s linear infinite;
     }
-    @keyframes shimmer { to { background-position: -200% 0; } }
-    .column-illustration { opacity: 0.12; transform: rotate(-6deg); }
-    .hero-title { letter-spacing: -0.02em; font-weight: 800; }
-    .tilt-card { transform: rotate(-2deg); transition: transform .35s ease, box-shadow .35s ease; }
-    .tilt-card:hover { transform: rotate(0deg) translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,0.5); }
-    @media(min-width:1024px){
-      .hero-title { font-size: clamp(2.2rem, 4vw, 3.6rem); }
+
+    @keyframes shimmer {
+      to {
+        background-position: -200% 0;
+      }
     }
+
+    .column-illustration {
+      opacity: 0.12;
+      transform: rotate(-6deg);
+    }
+
+    .hero-title {
+      letter-spacing: -0.02em;
+      font-weight: 800;
+    }
+
+    .tilt-card {
+      transform: rotate(-2deg);
+      transition: transform .35s ease, box-shadow .35s ease;
+    }
+
+    .tilt-card:hover {
+      transform: rotate(0deg) translateY(-6px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    @media(min-width:1024px) {
+      .hero-title {
+        font-size: clamp(2.2rem, 4vw, 3.6rem);
+      }
+    }
+
     .key-divider {
       background-image: repeating-linear-gradient(90deg, var(--greek-blue) 0 6px, transparent 6px 12px);
       height: 6px;
@@ -52,15 +81,17 @@
 
   {% block head %}{% endblock head %}
 </head>
+
 <body class="min-h-screen flex flex-col marble-bg text-gray-100">
 
   <!-- NAVBAR -->
   <header class="bg-[var(--greek-blue)]/90 backdrop-blur-sm sticky top-0 z-50 border-b border-[var(--greek-gold)]/20">
     <nav class="container mx-auto px-6 py-4 flex items-center justify-between">
       <a href="/" class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--greek-gold)] to-yellow-500 flex items-center justify-center text-[var(--greek-blue)] shadow-lg">
+        <div
+          class="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--greek-gold)] to-yellow-500 flex items-center justify-center text-[var(--greek-blue)] shadow-lg">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v18M3 12h18"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 3v18M3 12h18" />
           </svg>
         </div>
         <span class="text-xl font-extrabold text-[var(--greek-gold)]">RAS Q&A</span>
@@ -70,13 +101,27 @@
         <li><a href="/" class="hover:text-[var(--greek-gold)] transition">Home</a></li>
         <li><a href="/about" class="hover:text-[var(--greek-gold)] transition">About</a></li>
         <li><a href="/contact" class="hover:text-[var(--greek-gold)] transition">Contact</a></li>
-        <li><a href="/chatbot" class="px-4 py-2 rounded-full gold-shimmer border border-[var(--greek-gold)] shadow-sm hover:shadow-md transition">Chatbot</a></li>
+        <li><a href="/chatbot"
+            class="px-4 py-2 rounded-full gold-shimmer border border-[var(--greek-gold)] shadow-sm hover:shadow-md transition">Chatbot</a>
+        </li>
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded">
+            Logout
+          </button>
+        </form>
+        {% else %}
+        <a href="{% url 'login' %}">Login</a>
+        <a href="{% url 'signup' %}">Sign Up</a>
+        {% endif %}
       </ul>
 
       <div class="md:hidden">
-        <button aria-label="open menu" class="p-2 rounded-lg border border-[var(--greek-gold)]/40 bg-[var(--greek-blue)] text-[var(--greek-gold)] shadow-sm">
+        <button aria-label="open menu"
+          class="p-2 rounded-lg border border-[var(--greek-gold)]/40 bg-[var(--greek-blue)] text-[var(--greek-gold)] shadow-sm">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
         </button>
       </div>
@@ -93,7 +138,8 @@
     <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
       <div>
         <h3 class="text-lg font-bold">RAS Q&amp;A</h3>
-        <p class="mt-2 text-sm text-white/80">An elegant exam-prep platform inspired by the aesthetics of the classical world.</p>
+        <p class="mt-2 text-sm text-white/80">An elegant exam-prep platform inspired by the aesthetics of the classical
+          world.</p>
       </div>
 
       <div class="text-sm">
@@ -121,4 +167,5 @@
   </footer>
 
 </body>
+
 </html>
