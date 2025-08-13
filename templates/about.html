@@ -125,42 +125,53 @@
 </section>
 
 <!-- Team Section -->
-<section class="my-12 max-w-6xl mx-auto px-4">
+<section class="my-16 max-w-6xl mx-auto px-4">
   <h2 class="section-title">Meet the Team</h2>
-  <div class="team-grid">
 
-    <div class="team-card">
-      <img src="/media/nabeel.jpg" alt="Nabeel Ali Khan" class="team-photo">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+    <div class="team-card group">
+      <div class="overflow-hidden">
+        <img src="/media/nabeel.jpg" alt="Nabeel Ali Khan" class="team-photo group-hover:scale-105 transition-transform duration-500">
+      </div>
       <div class="team-info">
-        <h3>Nabeel Ali Khan</h3>
-        <p>Backend Developer</p>
+        <h3 class="font-semibold text-lg text-[var(--greek-blue)]">Nabeel Ali Khan</h3>
+        <p class="text-gray-600 text-sm">Backend Developer</p>
       </div>
     </div>
 
-    <div class="team-card">
-      <img src="/media/gitika.jpg" alt="Gitika" class="team-photo">
+    <div class="team-card group">
+      <div class="overflow-hidden">
+        <img src="/media/gitika.jpg" alt="Gitika" class="team-photo group-hover:scale-105 transition-transform duration-500">
+      </div>
       <div class="team-info">
-        <h3>Gitika</h3>
-        <p>Frontend Developer</p>
+        <h3 class="font-semibold text-lg text-[var(--greek-blue)]">Gitika</h3>
+        <p class="text-gray-600 text-sm">Frontend Developer</p>
       </div>
     </div>
 
-    <div class="team-card">
-      <img src="/media/sudhiksha.jpg" alt="Sudiksha Vashisht" class="team-photo">
+    <div class="team-card group">
+      <div class="overflow-hidden">
+        <img src="/media/sudhiksha.jpg" alt="Sudiksha Vashisht" class="team-photo group-hover:scale-105 transition-transform duration-500">
+      </div>
       <div class="team-info">
-        <h3>Sudiksha Vashisht</h3>
-        <p>Frontend Developer</p>
+        <h3 class="font-semibold text-lg text-[var(--greek-blue)]">Sudiksha Vashisht</h3>
+        <p class="text-gray-600 text-sm">Frontend Developer</p>
       </div>
     </div>
 
-    <div class="team-card">
-      <img src="/media/wasi.jpg" alt="Abdul Wasi" class="team-photo">
+    <div class="team-card group">
+      <div class="overflow-hidden">
+        <img src="/media/wasi.jpg" alt="Abdul Wasi" class="team-photo group-hover:scale-105 transition-transform duration-500">
+      </div>
       <div class="team-info">
-        <h3>Abdul Wasi</h3>
-        <p>Data Analyst</p>
+        <h3 class="font-semibold text-lg text-[var(--greek-blue)]">Abdul Wasi</h3>
+        <p class="text-gray-600 text-sm">Data Analyst</p>
       </div>
     </div>
 
   </div>
 </section>
+
+
 {% endblock content %}

@@ -39,6 +39,9 @@ def contact(request):
         form = forms.ContactForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, "✅ Your message has been sent successfully!")
+            return redirect('contact')  # Redirect to clear POST data
+
     else:
         form = forms.ContactForm()
     return render(request, "contact.html", {"form": form})
