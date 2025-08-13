@@ -10,7 +10,7 @@ from .forms import StyledSignupForm, StyledLoginForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.db.models import Max,Q
-
+import uuid
 
 
 # Home Page
@@ -45,63 +45,102 @@ def contact(request):
 
 # Chatbot (file upload + chat in one view)
 
+
 def chatbot(request):
-    # Determine which session to load
-    selected_session_id = request.GET.get("session_id")
-    if not request.session.session_key:
-        request.session.create()
-    if not selected_session_id:
-        selected_session_id = request.session.session_key
+    # ---------- Start New Chat (no logout) ----------
+    if request.GET.get("new_chat") == "1":
+        new_chat_id = uuid.uuid4().hex
+        request.session["current_chat_id"] = new_chat_id
+        return redirect(f"{request.path}?chat_id={new_chat_id}")
+
+    # ---------- Determine current chat_id ----------
+    chat_id = request.GET.get("chat_id") or request.session.get("current_chat_id")
+    if not chat_id:
+        chat_id = uuid.uuid4().hex
+        request.session["current_chat_id"] = chat_id
 
     file_text = None
     ai_response = None
-    form = forms.TextForm()
+    form = forms.TextForm()  # only handles the file field
 
-    # Fetch file_text if it exists in any uploaded file for this session
-    last_file_upload = models.PreprocessText.objects.filter(session_id=selected_session_id).order_by('-id').first()
-    if last_file_upload:
-        file_text = last_file_upload.file_text
-
+    # ---------- Handle POST ----------
     if request.method == "POST":
-        if 'file' in request.FILES:  # File upload
+        # FILE UPLOAD
+        if 'file' in request.FILES:
             form = forms.TextForm(request.POST, request.FILES)
             if form.is_valid():
                 obj = form.save(commit=False)
-                obj.session_id = selected_session_id  # attach to selected session
+                obj.session_id = chat_id
                 obj.save()
 
-                ext = os.path.splitext(obj.file.name)[1].lower()
-                if ext == '.txt':
-                    with open(obj.file.path, 'r', encoding='utf-8') as f:
-                        file_text = f.read()
-                elif ext == '.pdf':
-                    with open(obj.file.path, 'rb') as pdf_file:
-                        reader = PyPDF2.PdfReader(pdf_file)
-                        file_text = "".join(page.extract_text() for page in reader.pages)
-                elif ext == '.docx':
-                    doc = docx.Document(obj.file.path)
-                    file_text = "\n".join([para.text for para in doc.paragraphs])
+                file_path = obj.file.path
+                ext = os.path.splitext(file_path)[1].lower()
 
-                obj.file_text = file_text
+                try:
+                    if ext == '.txt':
+                        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                            file_text = f.read()
+
+                    elif ext == '.pdf':
+                        with open(file_path, 'rb') as pdf_file:
+                            reader = PyPDF2.PdfReader(pdf_file)
+                            pieces = []
+                            for page in reader.pages:
+                                try:
+                                    pieces.append(page.extract_text() or "")
+                                except Exception:
+                                    pieces.append("")
+                            file_text = "".join(pieces)
+
+                    elif ext == '.docx':
+                        doc = docx.Document(file_path)
+                        file_text = "\n".join([p.text for p in doc.paragraphs])
+
+                    else:
+                        messages.error(request, "Unsupported file type. Use .pdf, .docx, or .txt.")
+                        return redirect(f"{request.path}?chat_id={chat_id}")
+
+                except Exception as e:
+                    messages.error(request, f"Could not read file: {e}")
+                    return redirect(f"{request.path}?chat_id={chat_id}")
+
+                obj.file_text = file_text or ""
                 obj.save()
+                return redirect(f"{request.path}?chat_id={chat_id}")
+            else:
+                messages.error(request, "Invalid file upload.")
+                return redirect(f"{request.path}?chat_id={chat_id}")
 
+        # SEND MESSAGE
         elif 'message' in request.POST:
             user_message = request.POST.get("message", "").strip()
-            if file_text and user_message:
-                ai_response = ask_gemini(file_text + "\n\n" + user_message)
+
+            last_file_upload = models.PreprocessText.objects.filter(
+                session_id=chat_id
+            ).order_by('-id').first()
+
+            file_text = last_file_upload.file_text if last_file_upload else None
+            if not file_text:
+                messages.error(request, "Please upload a file first.")
+                return redirect(f"{request.path}?chat_id={chat_id}")
+
+            if user_message:
+                ai_response = ask_gemini(f"{file_text}\n\n{user_message}")
                 models.ChatHistory.objects.create(
                     user=request.user if request.user.is_authenticated else None,
-                    session_id=selected_session_id,  # keep old session ID
+                    session_id=chat_id,
                     user_message=user_message,
                     ai_response=ai_response
                 )
+                return redirect(f"{request.path}?chat_id={chat_id}")
 
-    # Chat history for selected session
-    chat_history = models.ChatHistory.objects.filter(
-        session_id=selected_session_id
-    ).order_by("created_at")
+    # ---------- Always fetch latest state ----------
+    last_file_upload = models.PreprocessText.objects.filter(session_id=chat_id).order_by('-id').first()
+    if last_file_upload:
+        file_text = last_file_upload.file_text
 
-    # Previous sessions list for sidebar
+    chat_history = models.ChatHistory.objects.filter(session_id=chat_id).order_by("created_at")
+
     previous_sessions = []
     if request.user.is_authenticated:
         previous_sessions = (
@@ -114,13 +153,12 @@ def chatbot(request):
 
     return render(request, "chatbot.html", {
         "form": form,
-        "file_text": file_text,  # always show input if a file exists
+        "file_text": file_text,
         "ai_response": ai_response,
         "chat_history": chat_history,
         "previous_sessions": previous_sessions,
-        "selected_session_id": selected_session_id
+        "chat_id": chat_id,
     })
-
 
 def signup(request):
     if request.method == "POST":
@@ -138,21 +176,29 @@ class CustomLoginView(LoginView):
     template_name = "registration/login.html"
 
 
+# views.py
+
 def subscribe(request):
     if request.method == "POST":
         email = request.POST.get("email") or (request.user.email if request.user.is_authenticated else None)
-        
+
         if not email:
             messages.error(request, "Please enter a valid email.")
             return redirect(request.META.get("HTTP_REFERER", "/"))
 
-        # Save email to database
-        obj, created = models.subscribers.objects.get_or_create(user=request.user,email=email)
+        # 🟢 Improved logic for creating a subscriber
+        user_instance = request.user if request.user.is_authenticated else None
+        
+        # Use email as the main lookup and provide user as a default
+        obj, created = models.subscribers.objects.update_or_create(
+            email=email,
+            defaults={'user': user_instance}
+        )
 
-        # Send confirmation email
+        # Send confirmation email (your existing logic is fine here)
         subject = "RAGQA Subscription Confirmation"
         message = (
-            f"Dear {request.user.first_name or 'Subscriber'},\n\n"
+            f"Dear {user_instance.first_name if user_instance and user_instance.first_name else 'Subscriber'},\n\n"
             "Thank you for subscribing to RAGQA.\n"
             "You’re now part of our intelligent Q&A community where knowledge meets precision.\n\n"
             "We look forward to helping you find accurate answers instantly.\n\n"
@@ -161,7 +207,6 @@ def subscribe(request):
         )
         send_email(email, subject, message)
 
-        # Show success or info message
         if created:
             messages.success(request, "Subscription successful! A confirmation email has been sent.")
         else:

@@ -4,7 +4,7 @@ from django.contrib.auth.views import LogoutView
 from django.contrib import admin
 
 urlpatterns = [
-    path("",views.index,name="Index"),
+    path("",views.index,name="index"),
     path("contact",views.contact,name="contact"),
     path("about",views.about,name="about"),
     path("chatbot",views.chatbot,name="chatbot"),

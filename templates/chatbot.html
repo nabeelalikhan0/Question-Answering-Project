@@ -1,31 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Chatbot{% endblock title %}
 {% load static %}
-{% load widget_tweaks %}
 
 {% block content %}
 <div class="min-h-screen flex bg-gradient-to-br from-indigo-600 via-purple-500 to-pink-500">
 
   <!-- Sidebar -->
   <aside class="w-64 bg-white/20 backdrop-blur-lg p-4 border-r border-white/30 overflow-y-auto">
-    <h2 class="text-white font-semibold mb-4">Previous Chats</h2>
+    <!-- Start New Chat -->
+    <a href="?new_chat=1"
+       class="block text-center mb-4 px-4 py-2 rounded-lg bg-[var(--greek-gold)] text-[var(--greek-blue)] font-semibold shadow hover:brightness-110 transition">
+       Start New Chat
+    </a>
 
-    <!-- Search Bar -->
-    <form method="get" action="" class="mb-4">
-      <input type="text" name="search" value="{{ search_query }}"
-        placeholder="Search chats..."
-        class="w-full px-3 py-2 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-pink-400" />
-      <button type="submit"
-        class="mt-2 w-full px-3 py-2 rounded-lg bg-pink-500 text-white hover:bg-pink-600 transition">
-        Search
-      </button>
-    </form>
+    <h2 class="text-white font-semibold mb-4">Previous Chats</h2>
 
     {% if previous_sessions %}
       <ul class="space-y-2">
         {% for session in previous_sessions %}
           <li>
-            <a href="?session_id={{ session.session_id }}"
+            <a href="?chat_id={{ session.session_id }}"
                class="block px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition">
               Chat on {{ session.last_message_time|date:"M d, Y H:i" }}
             </a>
@@ -47,10 +41,12 @@
 
     <!-- Upload Form -->
     <section class="p-4 border-b border-white/20">
-      <form action="" enctype="multipart/form-data" method="post" class="flex flex-col sm:flex-row gap-3">
+      <form action="" method="post" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3">
         {% csrf_token %}
-        {{ form.file|add_class:"flex-grow text-sm text-white border border-white/40 rounded-lg bg-white/10 placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" }}
-        <button type="submit" class="px-5 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium shadow hover:scale-105 hover:opacity-90 transition">
+        <input type="file" name="file" accept=".pdf,.docx,.txt"
+               class="flex-grow text-sm text-white border border-white/40 rounded-lg bg-white/10 file:bg-white/20 file:border-0 file:px-3 file:py-2 file:mr-3 file:rounded-md placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" />
+        <button type="submit"
+                class="px-5 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium shadow hover:scale-105 hover:opacity-90 transition">
           Upload
         </button>
       </form>
@@ -66,14 +62,12 @@
     <main id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4">
       {% if chat_history %}
         {% for chat in chat_history %}
-          <!-- User Message -->
           <div class="flex justify-start">
-            <div class="bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-gray-200 px-4 py-2 rounded-2xl shadow max-w-[75%]">
+            <div class="bg-white/80 text-gray-900 px-4 py-2 rounded-2xl shadow max-w-[75%]">
               {{ chat.user_message }}
             </div>
           </div>
 
-          <!-- AI Response -->
           {% if chat.ai_response %}
           <div class="flex justify-end">
             <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-2xl shadow max-w-[75%]">
@@ -87,21 +81,30 @@
       {% endif %}
     </main>
 
-    <!-- Chat Input -->
-    {% if file_text %}
-    <section class="border-t border-white/20 p-4 bg-white/10">
-      <form action="" method="post" class="flex items-center gap-3">
-        {% csrf_token %}
-        <input type="text" name="message" id="message" placeholder="Type your question..." required
-          class="flex-grow rounded-full px-5 py-2 border border-white/30 bg-white/10 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-pink-400" />
+<!-- Chat Input -->
+<section class="border-t border-white/20 p-4 bg-white/10">
+  <form action="" method="post" class="flex items-center gap-3">
+    {% csrf_token %}
+    <input type="text" name="message" id="message" placeholder="Type your question..." {% if not file_text %}disabled{% endif %}
+      class="flex-grow rounded-full px-5 py-2 border border-white/30 bg-white/10 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-pink-400 disabled:opacity-40 disabled:cursor-not-allowed" />
 
-        <!-- Send -->
-        <button type="submit" class="rounded-full px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow hover:scale-105 transition">
-          Send
-        </button>
-      </form>
-    </section>
-    {% endif %}
+    <!-- Mic Button -->
+    <button type="button" id="mic-btn"
+            class="rounded-full p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow hover:scale-105 transition {% if not file_text %}opacity-50 cursor-not-allowed{% endif %}"
+            {% if not file_text %}disabled{% endif %}>
+      🎤
+    </button>
+
+    <!-- Send Button -->
+    <button type="submit"
+            class="rounded-full px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow hover:scale-105 transition {% if not file_text %}opacity-50 cursor-not-allowed{% endif %}"
+            {% if not file_text %}disabled{% endif %}>
+      Send
+    </button>
+  </form>
+</section>
+
+
   </div>
 </div>
 
@@ -111,4 +114,53 @@ window.onload = () => {
   if (chatHistory) chatHistory.scrollTop = chatHistory.scrollHeight;
 };
 </script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const micBtn = document.getElementById("mic-btn");
+  const messageInput = document.getElementById("message");
+
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    console.warn("Speech Recognition not supported in this browser.");
+    micBtn.style.display = "none";
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.continuous = false;
+
+  micBtn.addEventListener("click", () => {
+    if (micBtn.disabled) return;
+
+    micBtn.classList.add("animate-pulse", "bg-gradient-to-r", "from-red-500", "to-red-700");
+    micBtn.textContent = "🎙️";
+
+    recognition.start();
+  });
+
+  recognition.addEventListener("result", (event) => {
+    const transcript = event.results[0][0].transcript;
+    messageInput.value = transcript;
+  });
+
+  recognition.addEventListener("end", () => {
+    micBtn.classList.remove("animate-pulse", "from-red-500", "to-red-700");
+    micBtn.classList.add("from-pink-500", "to-purple-500");
+    micBtn.textContent = "🎤";
+  });
+
+  recognition.addEventListener("error", (event) => {
+    console.error("Speech recognition error", event.error);
+    micBtn.classList.remove("animate-pulse", "from-red-500", "to-red-700");
+    micBtn.classList.add("from-pink-500", "to-purple-500");
+    micBtn.textContent = "🎤";
+  });
+});
+</script>
+
+
+
 {% endblock content %}

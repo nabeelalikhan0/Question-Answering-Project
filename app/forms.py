@@ -6,8 +6,9 @@ from . import models
 class TextForm(forms.ModelForm):
     class Meta:
         model = models.PreprocessText
-        fields = '__all__'
-        exclude = ['file_text']
+        # fields = '__all__'
+        # exclude = ['file_text']
+        fields = ['file'] 
 
 
 class ContactForm(forms.ModelForm):

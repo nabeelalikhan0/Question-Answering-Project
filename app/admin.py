@@ -4,8 +4,8 @@ from . import models
 
 @admin.register(models.PreprocessText)
 class PreprocessTextAdmin(admin.ModelAdmin):
-    list_display = ['short_text', 'file', 'short_file_text']
-    search_fields = ['text']
+    list_display = ['file', 'short_file_text']
+    # search_fields = ['text']
     list_filter = ['created_at', 'updated_at']
 
     def short_file_text(self, obj):
@@ -15,12 +15,12 @@ class PreprocessTextAdmin(admin.ModelAdmin):
 
     short_file_text.short_description = "File Text"
 
-    def short_text(self, obj):
-        if not obj.text:
-            return "No text"
-        return obj.text[:50] + ("..." if len(obj.text) > 50 else "")
+    # def short_text(self, obj):
+    #     if not obj.text:
+    #         return "No text"
+    #     return obj.text[:50] + ("..." if len(obj.text) > 50 else "")
 
-    short_text.short_description = "Text"
+    # short_text.short_description = "Text"
 
 
 @admin.register(models.Contact)
