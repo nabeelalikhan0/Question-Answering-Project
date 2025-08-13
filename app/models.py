@@ -1,3 +1,4 @@
+from encodings.punycode import T
 from turtle import ondrag
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -32,10 +33,18 @@ class Contact(TimeStampedModel):
 
 class PreprocessText(models.Model):
     session_id = models.CharField(max_length=255, default='default_session')
-    file = models.FileField(upload_to="uploads/",blank=True, null=True)
+    file = models.FileField(upload_to="uploads/", blank=True, null=True)
     file_text = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        # Show filename if available, else show first 50 chars of extracted text
+        if self.file:
+            return f"File: {self.file.name}"
+        elif self.file_text:
+            return self.file_text[:50]
+        return f"Session: {self.session_id}"
 
 
 class ChatHistory(models.Model):
@@ -49,6 +58,5 @@ class ChatHistory(models.Model):
         return f"{self.created_at} - {self.user_message[:50]}"
 
 class subscribers(TimeStampedModel):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
-    email = models.EmailField(max_length=255,blank=True,null=True)
-    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+    email = models.EmailField(max_length=255, blank=True, null=True)
