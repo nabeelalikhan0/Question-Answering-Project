@@ -1,4 +1,6 @@
+import json
 import os
+from uuid import uuid4
 import PyPDF2
 import docx
 from django.shortcuts import render,redirect,HttpResponse
@@ -11,6 +13,12 @@ from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.db.models import Max,Q
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import get_user_model
 
 
 
@@ -40,11 +48,70 @@ def contact(request):
         if form.is_valid():
             form.save()
             messages.success(request, "✅ Your message has been sent successfully!")
+            email = form.cleaned_data.get("email")  # get email value
+            
+            try:
+                send_email(
+                    email,
+                    "Thank You for Contacting RAGQA Support",
+                    "Hello,\n\nThank you for reaching out to RAGQA Support. "
+                    "We have received your message and our team will respond to you as soon as possible.\n\n"
+                    "Best regards,\nThe RAGQA Support Team"
+                )
+
+            except Exception as e:
+                messages.error(request, f"⚠️ Email sending failed: {e}")
+
+                
             return redirect('contact')  # Redirect to clear POST data
+
 
     else:
         form = forms.ContactForm()
     return render(request, "contact.html", {"form": form})
+
+
+User = get_user_model()
+
+@login_required
+def profile_view(request):
+    return render(request, "profile.html")
+
+@login_required
+def edit_profile(request):
+    if request.method == "POST":
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        email = request.POST.get("email")
+
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.save()
+
+        messages.success(request, "✅ Your profile has been updated successfully.")
+        return redirect("profile")
+    return redirect("profile")
+
+@login_required
+def change_password(request):
+    if request.method == "POST":
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Keep user logged in
+            messages.success(request, "✅ Your password has been updated successfully.")
+            return redirect("profile")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        form = PasswordChangeForm(request.user)
+
+    return render(request, "profile.html", {"password_form": form})
+
 
 
 # Chatbot (file upload + chat in one view)
@@ -148,26 +215,19 @@ def _extract_text_from_any_file(file_path: str, ext: str, content_type: str | No
 
 # ---------- View ----------
 
-def chatbot(request):
-    """
-    - Reliable New Chat via GET ?new_chat=1 (never logs out)
-    - Solid file upload (no widget_tweaks needed)
-    - Chat history preserved per session_id
-    - Optional search in current session history
-    - Works with/without authentication
-    """
 
-    # Ensure the browser session exists
+def chatbot(request):
+    # Ensure session exists
     if not request.session.session_key:
         request.session.create()
 
-    # Handle "Start new chat"
+    # Start new chat
     if request.GET.get("new_chat") == "1":
         new_id = uuid4().hex
         request.session["active_chat_session"] = new_id
         return redirect(f"{reverse('chatbot')}?session_id={new_id}")
 
-    # Resolve the active session id (URL param > saved active > default to current session key)
+    # Active session
     selected_session_id = (
         request.GET.get("session_id")
         or request.session.get("active_chat_session")
@@ -178,80 +238,65 @@ def chatbot(request):
     file_text = None
     ai_response = None
 
-    # ---------- POST handlers ----------
+    # POST: File upload or chat message
     if request.method == "POST":
-        # A) File Upload
+        # File upload
         if "file" in request.FILES:
             up = request.FILES["file"]
-            # Save DB row first to persist the file
             obj = models.PreprocessText.objects.create(
                 session_id=selected_session_id,
                 file=up,
             )
             ext = os.path.splitext(obj.file.name)[1].lower()
             content_type = getattr(up, "content_type", None)
-
             extracted = _extract_text_from_any_file(obj.file.path, ext, content_type)
             obj.file_text = extracted
             obj.save()
 
-            if not extracted or extracted.startswith("[") and "error" in extracted.lower():
+            if not extracted or (extracted.startswith("[") and "error" in extracted.lower()):
                 messages.warning(
                     request,
                     "Uploaded, but text extraction may be limited. You can still ask questions."
                 )
-
-            # Redirect to clear POST and show updated state
             return redirect(f"{reverse('chatbot')}?session_id={selected_session_id}")
 
-        # B) Send Chat Message
+        # Chat message
         user_message = (request.POST.get("message") or "").strip()
         if user_message:
-            last_file = (
-                models.PreprocessText.objects
-                .filter(session_id=selected_session_id)
-                .order_by("-id")
-                .first()
-            )
+            last_file = models.PreprocessText.objects.filter(session_id=selected_session_id).order_by("-id").first()
             file_text = last_file.file_text if last_file else None
-
             if not file_text:
                 messages.error(request, "Please upload a file first.")
             else:
-                # Import here to avoid circulars if you moved things around
                 from .gemini import ask_gemini
                 ai_response = ask_gemini(f"{file_text}\n\n{user_message}")
-
                 models.ChatHistory.objects.create(
                     user=request.user if request.user.is_authenticated else None,
                     session_id=selected_session_id,
                     user_message=user_message,
                     ai_response=ai_response,
                 )
-
             return redirect(f"{reverse('chatbot')}?session_id={selected_session_id}")
 
-    # ---------- GET page load ----------
-    # Latest extracted text for this session (controls whether chat input shows)
-    last_file = (
-        models.PreprocessText.objects
-        .filter(session_id=selected_session_id)
-        .order_by("-id")
-        .first()
-    )
+    # GET: page load
+    last_file = models.PreprocessText.objects.filter(session_id=selected_session_id).order_by("-id").first()
     if last_file:
         file_text = last_file.file_text
 
-    # Search within this session
+    # Chat search
     search_query = (request.GET.get("search") or "").strip()
-    chat_qs = models.ChatHistory.objects.filter(session_id=selected_session_id)
-    if search_query:
+    if search_query and request.user.is_authenticated:
+        # Search across all sessions for this user
+        chat_qs = models.ChatHistory.objects.filter(user=request.user)
         chat_qs = chat_qs.filter(
             Q(user_message__icontains=search_query) | Q(ai_response__icontains=search_query)
         )
+    else:
+        # Default: show current session
+        chat_qs = models.ChatHistory.objects.filter(session_id=selected_session_id)
     chat_history = chat_qs.order_by("created_at")
 
-    # Previous sessions (only for logged-in users)
+    # Previous sessions for user
     previous_sessions = []
     if request.user.is_authenticated:
         previous_sessions = (
@@ -262,18 +307,14 @@ def chatbot(request):
             .order_by("-last_message_time")
         )
 
-    return render(
-        request,
-        "chatbot.html",
-        {
-            "file_text": file_text,
-            "ai_response": ai_response,
-            "chat_history": chat_history,
-            "previous_sessions": previous_sessions,
-            "selected_session_id": selected_session_id,
-            "search_query": search_query,
-        },
-    )
+    return render(request, "chatbot.html", {
+        "file_text": file_text,
+        "ai_response": ai_response,
+        "chat_history": chat_history,
+        "previous_sessions": previous_sessions,
+        "selected_session_id": selected_session_id,
+        "search_query": search_query,
+    })
 
 
 def signup(request):

@@ -8,6 +8,10 @@ urlpatterns = [
     path("contact",views.contact,name="contact"),
     path("about",views.about,name="about"),
     path("chatbot",views.chatbot,name="chatbot"),
+    path("profile/", views.profile_view, name="profile"),
+    path("profile/edit/", views.edit_profile, name="edit_profile"),
+    path("profile/change-password/", views.change_password, name="change_password"),
+    
     # path("chatbot/chat/",views.chatbot_chat,name="chatbot_chat")
 
     path('signup/', views.signup, name='signup'),
