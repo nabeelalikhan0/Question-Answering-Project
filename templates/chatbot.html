@@ -1,166 +1,191 @@
 {% extends "base.html" %}
 {% block title %}Chatbot{% endblock title %}
-{% load static %}
 
 {% block content %}
-<div class="min-h-screen flex bg-gradient-to-br from-indigo-600 via-purple-500 to-pink-500">
+<div class="min-h-screen flex bg-[var(--greek-blue)]/20">
 
   <!-- Sidebar -->
-  <aside class="w-64 bg-white/20 backdrop-blur-lg p-4 border-r border-white/30 overflow-y-auto">
-    <!-- Start New Chat -->
-    <a href="?new_chat=1"
-       class="block text-center mb-4 px-4 py-2 rounded-lg bg-[var(--greek-gold)] text-[var(--greek-blue)] font-semibold shadow hover:brightness-110 transition">
-       Start New Chat
-    </a>
+  <aside
+    class="w-64 bg-[var(--greek-blue)]/40 backdrop-blur-lg p-4 border-r border-[var(--greek-gold)]/20 overflow-y-auto rounded-lg">
+    <h2 class="text-[var(--greek-gold)] font-semibold mb-4">Previous Chats</h2>
 
-    <h2 class="text-white font-semibold mb-4">Previous Chats</h2>
+    <!-- Start New Chat -->
+    <div class="mb-4">
+      <a href="{% url 'chatbot' %}?new_chat=1"
+        class="block text-center px-3 py-2 rounded-lg bg-orange-500 hover:bg-[var(--greek-gold)] text-white font-semibold shadow transition">
+        Start New Chat
+      </a>
+    </div>
+
+
+
+    <!-- Search Bar -->
+    <form method="get" action="" class="mb-4">
+      <input type="text" name="search" value="{{ search_query }}" placeholder="Search chats..."
+        class="w-full px-3 py-2 rounded-lg text-[var(--greek-blue)] bg-white focus:outline-none focus:ring-2 focus:ring-yellow-400" />
+      {% if selected_session_id %}
+      <input type="hidden" name="session_id" value="{{ selected_session_id }}">
+      {% endif %}
+      <button type="submit"
+        class="mt-2 w-full px-3 py-2 rounded-lg bg-[var(--greek-gold)] text-[var(--greek-blue)] hover:opacity-90 transition">
+        Search
+      </button>
+    </form>
 
     {% if previous_sessions %}
-      <ul class="space-y-2">
-        {% for session in previous_sessions %}
-          <li>
-            <a href="?chat_id={{ session.session_id }}"
-               class="block px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition">
-              Chat on {{ session.last_message_time|date:"M d, Y H:i" }}
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
+    <ul class="space-y-2">
+      {% for session in previous_sessions %}
+      <li>
+        <a href="{% url 'chatbot' %}?session_id={{ session.session_id }}"
+          class="block px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm transition">
+          Chat on {{ session.last_message_time|date:"M d, Y H:i" }}
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
     {% else %}
-      <p class="text-white/70 text-sm">No previous chats</p>
+    <p class="text-white/70 text-sm">No previous chats</p>
     {% endif %}
   </aside>
 
   <!-- Main Chat Area -->
-  <div class="flex-1 flex flex-col h-screen overflow-hidden">
+  <div class="flex-1 flex flex-col h-[calc(100vh-6rem)] overflow-hidden">
 
     <!-- Header -->
-    <header class="text-white font-semibold text-2xl text-center py-4 bg-gradient-to-r from-pink-500/90 via-purple-500/90 to-indigo-500/90 shadow-lg tracking-wide">
-      RAG Question Answering System
+    <header
+      class="text-[var(--greek-gold)] font-semibold text-2xl text-center py-4 bg-[var(--greek-blue)]/70 shadow-lg tracking-wide rounded-lg">
+      RAS / RAG Question Answering System
     </header>
 
     <!-- Upload Form -->
-    <section class="p-4 border-b border-white/20">
-      <form action="" method="post" enctype="multipart/form-data" class="flex flex-col sm:flex-row gap-3">
+    <section class="p-4 border-b border-[var(--greek-gold)]/20">
+      <form action="" enctype="multipart/form-data" method="post" class="flex flex-col sm:flex-row gap-3 items-start">
         {% csrf_token %}
-        <input type="file" name="file" accept=".pdf,.docx,.txt"
-               class="flex-grow text-sm text-white border border-white/40 rounded-lg bg-white/10 file:bg-white/20 file:border-0 file:px-3 file:py-2 file:mr-3 file:rounded-md placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-pink-400" />
+        <input type="file" name="file" accept="*/*"
+          class="flex-1 file:mr-4 file:px-4 file:py-2 file:rounded-lg file:border-0 file:bg-[var(--greek-gold)] file:text-[var(--greek-blue)] file:font-semibold
+                 px-3 py-2 rounded-lg border border-white/30 bg-white/10 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
         <button type="submit"
-                class="px-5 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium shadow hover:scale-105 hover:opacity-90 transition">
+          class="px-5 py-2 rounded-lg bg-[var(--greek-gold)] text-[var(--greek-blue)] font-medium shadow hover:scale-105 hover:opacity-90 transition">
           Upload
         </button>
       </form>
 
       {% if file_text %}
-        <div class="mt-4 max-h-28 overflow-auto text-sm p-3 rounded-lg bg-white/10 text-white border border-white/20 whitespace-pre-wrap">
-          {{ file_text }}
-        </div>
+      <div
+        class="mt-4 max-h-28 overflow-auto text-sm p-3 rounded-lg bg-white/10 text-white border border-white/20 whitespace-pre-wrap">
+        {{ file_text }}
+      </div>
       {% endif %}
     </section>
 
     <!-- Chat History -->
     <main id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-4">
       {% if chat_history %}
-        {% for chat in chat_history %}
-          <div class="flex justify-start">
-            <div class="bg-white/80 text-gray-900 px-4 py-2 rounded-2xl shadow max-w-[75%]">
-              {{ chat.user_message }}
-            </div>
-          </div>
+      {% for chat in chat_history %}
+      <!-- User Message (right) -->
+      <div class="flex justify-end">
+        <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-2xl shadow max-w-[75%]">
+          {{ chat.user_message }}
+        </div>
+      </div>
 
-          {% if chat.ai_response %}
-          <div class="flex justify-end">
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-2xl shadow max-w-[75%]">
-              {{ chat.ai_response }}
-            </div>
-          </div>
-          {% endif %}
-        {% endfor %}
+
+      <!-- AI Response (left) -->
+      {% if chat.ai_response %}
+      <div class="flex justify-start">
+        <div class="bg-white/80 text-gray-900 px-4 py-2 rounded-2xl shadow max-w-[75%]">
+          {{ chat.ai_response }}
+        </div>
+      </div>
+      {% endif %}
+
+
+      {% endfor %}
       {% else %}
-        <p class="text-white/80 text-center">Upload a file and start chatting!</p>
+      <p class="text-white/80 text-center">Upload a file and start chatting!</p>
       {% endif %}
     </main>
 
-<!-- Chat Input -->
-<section class="border-t border-white/20 p-4 bg-white/10">
-  <form action="" method="post" class="flex items-center gap-3">
-    {% csrf_token %}
-    <input type="text" name="message" id="message" placeholder="Type your question..." {% if not file_text %}disabled{% endif %}
-      class="flex-grow rounded-full px-5 py-2 border border-white/30 bg-white/10 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-pink-400 disabled:opacity-40 disabled:cursor-not-allowed" />
 
-    <!-- Mic Button -->
-    <button type="button" id="mic-btn"
-            class="rounded-full p-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow hover:scale-105 transition {% if not file_text %}opacity-50 cursor-not-allowed{% endif %}"
-            {% if not file_text %}disabled{% endif %}>
-      🎤
-    </button>
+    <!-- Chat Input -->
+    {% if file_text %}
+    <section class="border-t border-[var(--greek-gold)]/20 p-4 bg-white/5">
+      <form action="" method="post" class="flex items-center gap-3">
+        {% csrf_token %}
+        <input type="text" name="message" id="message" placeholder="Type your question..." required
+          class="flex-grow rounded-full px-5 py-2 border border-white/30 bg-white/10 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-yellow-400" />
 
-    <!-- Send Button -->
-    <button type="submit"
-            class="rounded-full px-5 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow hover:scale-105 transition {% if not file_text %}opacity-50 cursor-not-allowed{% endif %}"
-            {% if not file_text %}disabled{% endif %}>
-      Send
-    </button>
-  </form>
-</section>
+        <!-- Simple mic (theme-matched) -->
+        <button type="button" id="micBtn"
+          class="rounded-full p-2 border border-[var(--greek-gold)]/50 bg-[var(--greek-blue)]/60 text-[var(--greek-gold)] hover:bg-[var(--greek-blue)] transition shadow"
+          title="Speak">
+          <!-- Simple mic icon -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              d="M12 14a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Zm-7-3a1 1 0 1 1 2 0 5 5 0 0 0 10 0 1 1 0 1 1 2 0 7 7 0 0 1-6 6.93V21h3a1 1 0 1 1 0 2H10a1 1 0 1 1 0-2h3v-3.07A7 7 0 0 1 5 11Z" />
+          </svg>
+        </button>
 
-
+        <button type="submit"
+          class="rounded-full px-5 py-2 bg-[var(--greek-gold)] text-[var(--greek-blue)] shadow hover:scale-105 transition">
+          Send
+        </button>
+      </form>
+      <p id="micStatus" class="text-xs text-white/70 mt-2 hidden">Listening… tap mic to stop.</p>
+    </section>
+    {% endif %}
   </div>
 </div>
 
 <script>
-window.onload = () => {
-  const chatHistory = document.getElementById('chat-history');
-  if (chatHistory) chatHistory.scrollTop = chatHistory.scrollHeight;
-};
+  // Always scroll chat to bottom
+  window.onload = () => {
+    const chatHistory = document.getElementById('chat-history');
+    if (chatHistory) chatHistory.scrollTop = chatHistory.scrollHeight;
+  };
+
+  // Simple mic using Web Speech API
+  (function () {
+    const micBtn = document.getElementById('micBtn');
+    const status = document.getElementById('micStatus');
+    const input = document.getElementById('message');
+    if (!micBtn || !input) return;
+
+    let rec, listening = false;
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) {
+      micBtn.disabled = true;
+      micBtn.title = "Speech recognition not supported by this browser";
+      return;
+    }
+
+    rec = new SR();
+    rec.lang = 'en-US';
+    rec.interimResults = false;
+
+    rec.onresult = (e) => {
+      const text = Array.from(e.results).map(r => r[0].transcript).join(' ');
+      input.value = (input.value ? input.value + ' ' : '') + text;
+    };
+
+    rec.onend = () => {
+      listening = false;
+      status.classList.add('hidden');
+    };
+
+    micBtn.addEventListener('click', () => {
+      if (listening) {
+        try { rec.stop(); } catch (e) { }
+        return;
+      }
+      try {
+        rec.start();
+        listening = true;
+        status.classList.remove('hidden');
+      } catch (e) {
+        console.error(e);
+      }
+    });
+  })();
 </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const micBtn = document.getElementById("mic-btn");
-  const messageInput = document.getElementById("message");
-
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    console.warn("Speech Recognition not supported in this browser.");
-    micBtn.style.display = "none";
-    return;
-  }
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.interimResults = false;
-  recognition.continuous = false;
-
-  micBtn.addEventListener("click", () => {
-    if (micBtn.disabled) return;
-
-    micBtn.classList.add("animate-pulse", "bg-gradient-to-r", "from-red-500", "to-red-700");
-    micBtn.textContent = "🎙️";
-
-    recognition.start();
-  });
-
-  recognition.addEventListener("result", (event) => {
-    const transcript = event.results[0][0].transcript;
-    messageInput.value = transcript;
-  });
-
-  recognition.addEventListener("end", () => {
-    micBtn.classList.remove("animate-pulse", "from-red-500", "to-red-700");
-    micBtn.classList.add("from-pink-500", "to-purple-500");
-    micBtn.textContent = "🎤";
-  });
-
-  recognition.addEventListener("error", (event) => {
-    console.error("Speech recognition error", event.error);
-    micBtn.classList.remove("animate-pulse", "from-red-500", "to-red-700");
-    micBtn.classList.add("from-pink-500", "to-purple-500");
-    micBtn.textContent = "🎤";
-  });
-});
-</script>
-
-
-
 {% endblock content %}
