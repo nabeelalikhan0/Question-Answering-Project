@@ -10,7 +10,8 @@ from .forms import StyledSignupForm, StyledLoginForm
 from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.db.models import Max,Q
-import uuid
+from django.urls import reverse
+
 
 
 # Home Page
@@ -45,120 +46,232 @@ def contact(request):
 
 # Chatbot (file upload + chat in one view)
 
+def _extract_text_from_any_file(file_path: str, ext: str, content_type: str | None = None) -> str:
+    """
+    Best-effort text extraction for many file types.
+    Falls back to decoding bytes if no dedicated extractor fits.
+    """
+    ext = (ext or "").lower()
+
+    # 1) Plain text
+    if ext in (".txt", ".log", ".md", ".csv"):
+        # CSV shown as plain text; you can switch to pandas if you prefer a table text
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            return f.read()
+
+    # 2) PDF
+    if ext == ".pdf":
+        text_chunks = []
+        with open(file_path, "rb") as pdff:
+            reader = PyPDF2.PdfReader(pdff)
+            for page in reader.pages:
+                t = page.extract_text() or ""
+                if t:
+                    text_chunks.append(t)
+        return "\n".join(text_chunks).strip() or "[No text extracted from PDF]"
+
+    # 3) DOCX
+    if ext == ".docx":
+        d = docx.Document(file_path)
+        return "\n".join(p.text for p in d.paragraphs).strip() or "[No text extracted from DOCX]"
+
+    # 4) PPTX
+    if ext == ".pptx":
+        try:
+            from pptx import Presentation
+            prs = Presentation(file_path)
+            out = []
+            for slide in prs.slides:
+                for shape in slide.shapes:
+                    if hasattr(shape, "text"):
+                        out.append(shape.text)
+            return "\n".join(out).strip() or "[No text in PPTX]"
+        except Exception as e:
+            return f"[PPTX read error: {e}]"
+
+    # 5) XLSX/XLS (first ~1000 rows)
+    if ext in (".xlsx", ".xls"):
+        try:
+            import pandas as pd
+            df = pd.read_excel(file_path, nrows=1000)  # limit for sanity
+            return df.to_string(index=False)
+        except Exception as e:
+            return f"[Excel read error: {e}]"
+
+    # 6) HTML
+    if ext in (".html", ".htm"):
+        try:
+            from bs4 import BeautifulSoup
+            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                soup = BeautifulSoup(f, "html.parser")
+            return soup.get_text(separator=" ", strip=True)
+        except Exception as e:
+            return f"[HTML parse error: {e}]"
+
+    # 7) JSON
+    if ext == ".json":
+        try:
+            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                data = json.load(f)
+            return json.dumps(data, indent=2, ensure_ascii=False)
+        except Exception:
+            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                return f.read()
+
+    # 8) Images -> OCR (best effort)
+    if ext in (".png", ".jpg", ".jpeg", ".bmp", ".webp", ".tif", ".tiff"):
+        try:
+            import pytesseract
+            from PIL import Image
+            text = pytesseract.image_to_string(Image.open(file_path))
+            text = (text or "").strip()
+            return text if text else "[No text detected via OCR]"
+        except Exception as e:
+            return f"[OCR unavailable: {e}]"
+
+    # 9) Fallback: try decode bytes
+    try:
+        with open(file_path, "rb") as f:
+            raw = f.read()
+        try:
+            return raw.decode("utf-8")
+        except UnicodeDecodeError:
+            try:
+                return raw.decode("latin-1")
+            except UnicodeDecodeError:
+                return "[Unsupported file type for text extraction]"
+    except Exception as e:
+        return f"[File read error: {e}]"
+
+# ---------- View ----------
 
 def chatbot(request):
-    # ---------- Start New Chat (no logout) ----------
-    if request.GET.get("new_chat") == "1":
-        new_chat_id = uuid.uuid4().hex
-        request.session["current_chat_id"] = new_chat_id
-        return redirect(f"{request.path}?chat_id={new_chat_id}")
+    """
+    - Reliable New Chat via GET ?new_chat=1 (never logs out)
+    - Solid file upload (no widget_tweaks needed)
+    - Chat history preserved per session_id
+    - Optional search in current session history
+    - Works with/without authentication
+    """
 
-    # ---------- Determine current chat_id ----------
-    chat_id = request.GET.get("chat_id") or request.session.get("current_chat_id")
-    if not chat_id:
-        chat_id = uuid.uuid4().hex
-        request.session["current_chat_id"] = chat_id
+    # Ensure the browser session exists
+    if not request.session.session_key:
+        request.session.create()
+
+    # Handle "Start new chat"
+    if request.GET.get("new_chat") == "1":
+        new_id = uuid4().hex
+        request.session["active_chat_session"] = new_id
+        return redirect(f"{reverse('chatbot')}?session_id={new_id}")
+
+    # Resolve the active session id (URL param > saved active > default to current session key)
+    selected_session_id = (
+        request.GET.get("session_id")
+        or request.session.get("active_chat_session")
+        or request.session.session_key
+    )
+    request.session["active_chat_session"] = selected_session_id
 
     file_text = None
     ai_response = None
-    form = forms.TextForm()  # only handles the file field
 
-    # ---------- Handle POST ----------
+    # ---------- POST handlers ----------
     if request.method == "POST":
-        # FILE UPLOAD
-        if 'file' in request.FILES:
-            form = forms.TextForm(request.POST, request.FILES)
-            if form.is_valid():
-                obj = form.save(commit=False)
-                obj.session_id = chat_id
-                obj.save()
+        # A) File Upload
+        if "file" in request.FILES:
+            up = request.FILES["file"]
+            # Save DB row first to persist the file
+            obj = models.PreprocessText.objects.create(
+                session_id=selected_session_id,
+                file=up,
+            )
+            ext = os.path.splitext(obj.file.name)[1].lower()
+            content_type = getattr(up, "content_type", None)
 
-                file_path = obj.file.path
-                ext = os.path.splitext(file_path)[1].lower()
+            extracted = _extract_text_from_any_file(obj.file.path, ext, content_type)
+            obj.file_text = extracted
+            obj.save()
 
-                try:
-                    if ext == '.txt':
-                        with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
-                            file_text = f.read()
+            if not extracted or extracted.startswith("[") and "error" in extracted.lower():
+                messages.warning(
+                    request,
+                    "Uploaded, but text extraction may be limited. You can still ask questions."
+                )
 
-                    elif ext == '.pdf':
-                        with open(file_path, 'rb') as pdf_file:
-                            reader = PyPDF2.PdfReader(pdf_file)
-                            pieces = []
-                            for page in reader.pages:
-                                try:
-                                    pieces.append(page.extract_text() or "")
-                                except Exception:
-                                    pieces.append("")
-                            file_text = "".join(pieces)
+            # Redirect to clear POST and show updated state
+            return redirect(f"{reverse('chatbot')}?session_id={selected_session_id}")
 
-                    elif ext == '.docx':
-                        doc = docx.Document(file_path)
-                        file_text = "\n".join([p.text for p in doc.paragraphs])
+        # B) Send Chat Message
+        user_message = (request.POST.get("message") or "").strip()
+        if user_message:
+            last_file = (
+                models.PreprocessText.objects
+                .filter(session_id=selected_session_id)
+                .order_by("-id")
+                .first()
+            )
+            file_text = last_file.file_text if last_file else None
 
-                    else:
-                        messages.error(request, "Unsupported file type. Use .pdf, .docx, or .txt.")
-                        return redirect(f"{request.path}?chat_id={chat_id}")
-
-                except Exception as e:
-                    messages.error(request, f"Could not read file: {e}")
-                    return redirect(f"{request.path}?chat_id={chat_id}")
-
-                obj.file_text = file_text or ""
-                obj.save()
-                return redirect(f"{request.path}?chat_id={chat_id}")
-            else:
-                messages.error(request, "Invalid file upload.")
-                return redirect(f"{request.path}?chat_id={chat_id}")
-
-        # SEND MESSAGE
-        elif 'message' in request.POST:
-            user_message = request.POST.get("message", "").strip()
-
-            last_file_upload = models.PreprocessText.objects.filter(
-                session_id=chat_id
-            ).order_by('-id').first()
-
-            file_text = last_file_upload.file_text if last_file_upload else None
             if not file_text:
                 messages.error(request, "Please upload a file first.")
-                return redirect(f"{request.path}?chat_id={chat_id}")
-
-            if user_message:
+            else:
+                # Import here to avoid circulars if you moved things around
+                from .gemini import ask_gemini
                 ai_response = ask_gemini(f"{file_text}\n\n{user_message}")
+
                 models.ChatHistory.objects.create(
                     user=request.user if request.user.is_authenticated else None,
-                    session_id=chat_id,
+                    session_id=selected_session_id,
                     user_message=user_message,
-                    ai_response=ai_response
+                    ai_response=ai_response,
                 )
-                return redirect(f"{request.path}?chat_id={chat_id}")
 
-    # ---------- Always fetch latest state ----------
-    last_file_upload = models.PreprocessText.objects.filter(session_id=chat_id).order_by('-id').first()
-    if last_file_upload:
-        file_text = last_file_upload.file_text
+            return redirect(f"{reverse('chatbot')}?session_id={selected_session_id}")
 
-    chat_history = models.ChatHistory.objects.filter(session_id=chat_id).order_by("created_at")
+    # ---------- GET page load ----------
+    # Latest extracted text for this session (controls whether chat input shows)
+    last_file = (
+        models.PreprocessText.objects
+        .filter(session_id=selected_session_id)
+        .order_by("-id")
+        .first()
+    )
+    if last_file:
+        file_text = last_file.file_text
 
+    # Search within this session
+    search_query = (request.GET.get("search") or "").strip()
+    chat_qs = models.ChatHistory.objects.filter(session_id=selected_session_id)
+    if search_query:
+        chat_qs = chat_qs.filter(
+            Q(user_message__icontains=search_query) | Q(ai_response__icontains=search_query)
+        )
+    chat_history = chat_qs.order_by("created_at")
+
+    # Previous sessions (only for logged-in users)
     previous_sessions = []
     if request.user.is_authenticated:
         previous_sessions = (
             models.ChatHistory.objects
             .filter(user=request.user)
-            .values('session_id')
-            .annotate(last_message_time=Max('created_at'))
-            .order_by('-last_message_time')
+            .values("session_id")
+            .annotate(last_message_time=Max("created_at"))
+            .order_by("-last_message_time")
         )
 
-    return render(request, "chatbot.html", {
-        "form": form,
-        "file_text": file_text,
-        "ai_response": ai_response,
-        "chat_history": chat_history,
-        "previous_sessions": previous_sessions,
-        "chat_id": chat_id,
-    })
+    return render(
+        request,
+        "chatbot.html",
+        {
+            "file_text": file_text,
+            "ai_response": ai_response,
+            "chat_history": chat_history,
+            "previous_sessions": previous_sessions,
+            "selected_session_id": selected_session_id,
+            "search_query": search_query,
+        },
+    )
+
 
 def signup(request):
     if request.method == "POST":
