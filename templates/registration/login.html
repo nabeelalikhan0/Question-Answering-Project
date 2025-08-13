@@ -12,7 +12,7 @@
       {% for field in form %}
         <div>
           <label class="block text-sm font-semibold mb-1">{{ field.label }}</label>
-          {{ field|add_class:"w-full px-3 py-2 rounded-md text-[var(--greek-blue)] focus:outline-none focus:ring-2 focus:ring-[var(--greek-gold)]" }}
+          {{ field|add_class:"w-full px-3 py-2 rounded-md text-[var(--greek-white)] focus:outline-none focus:ring-2 focus:ring-[var(--greek-gold)]" }}
           {% if field.errors %}
             <p class="text-red-400 text-sm mt-1">{{ field.errors|join:", " }}</p>
           {% endif %}
