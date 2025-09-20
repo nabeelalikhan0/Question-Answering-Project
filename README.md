@@ -21,12 +21,12 @@ This project is a Django web application that allows you to **upload a file** (T
 
 - **Backend**: [Django](https://www.djangoproject.com/)
 - **AI Model**: [Google Gemini API](https://ai.google.dev)
-- **Frontend**: HTML + Django Templates
+- **Frontend**: HTML + CSS (Tailwind) + Django Templates + AJAX
 - **File Parsing**:
   - [PyPDF2](https://pypi.org/project/PyPDF2/) for PDFs
   - [python-docx](https://pypi.org/project/python-docx/) for DOCX
   - Built-in Python for TXT
-
+  - Cutom Functions
 ---
 
 ## 📦 Installation
