@@ -9,7 +9,7 @@ This project is a Django web application that allows you to **upload a file** (T
 
 ## 🚀 Features
 
-- 📂 **Upload Files**: Supports `.txt`, `.pdf`, `.docx` formats.
+- 📂 **Upload Files**: Supports `.txt`, `.pdf`, `.docx` and `more`formats.
 - 🧠 **Text Extraction**: Automatically reads and processes file content.
 - 💬 **Interactive Chat**: Ask questions and receive answers **only** from your uploaded file.
 - 🔄 **Persistent Context**: The chatbot remembers your uploaded file during the session.
