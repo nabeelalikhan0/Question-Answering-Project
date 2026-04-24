@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock title %}
+
+{% block content %}
+<div class="min-h-screen bg-[var(--greek-blue)]/10 py-10">
+  <div class="max-w-4xl mx-auto bg-white/80 backdrop-blur-lg rounded-xl shadow-lg p-8 border border-[var(--greek-gold)]/30">
+    
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-[var(--greek-blue)]">{{ user.get_full_name|default:user.username }}</h1>
+      <p class="text-gray-700">{{ user.email }}</p>
+      <p class="text-sm text-gray-500">Joined: {{ user.date_joined|date:"F j, Y" }}</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-300 mb-6">
+      <ul class="flex gap-6 text-[var(--greek-blue)] font-semibold">
+        <li><a href="#details" class="hover:text-[var(--greek-gold)]">Profile Details</a></li>
+        <li><a href="#edit" class="hover:text-[var(--greek-gold)]">Edit Profile</a></li>
+        <li><a href="#password" class="hover:text-[var(--greek-gold)]">Change Password</a></li>
+      </ul>
+    </div>
+
+    <!-- Profile Details -->
+    <section id="details" class="mb-8">
+      <h2 class="text-lg font-semibold text-[var(--greek-blue)] mb-3">Profile Details</h2>
+      <div class="bg-white rounded-lg border border-gray-200 text-[var(--greek-gold)] p-4 shadow-sm">
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+        <p><strong>First Name:</strong> {{ user.first_name }}</p>
+        <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+      </div>
+    </section>
+
+    <!-- Edit Profile Form -->
+    <section id="edit" class="mb-8">
+      <h2 class="text-lg font-semibold text-[var(--greek-blue)] mb-3">Edit Profile</h2>
+      <form action="{% url 'edit_profile' %}" method="post" class="space-y-4">
+        {% csrf_token %}
+        <div>
+          <label class="block text-sm font-medium text-gray-700">First Name</label>
+          <input type="text" name="first_name" value="{{ user.first_name }}" 
+                 class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-[var(--greek-gold)]">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Last Name</label>
+          <input type="text" name="last_name" value="{{ user.last_name }}" 
+                 class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-[var(--greek-gold)]">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Email</label>
+          <input type="email" name="email" value="{{ user.email }}" 
+                 class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-[var(--greek-gold)]">
+        </div>
+        <button type="submit"
+                class="px-5 py-2 bg-[var(--greek-gold)] text-[var(--greek-blue)] rounded-lg shadow hover:opacity-90 transition">
+          Save Changes
+        </button>
+      </form>
+    </section>
+
+    <!-- Change Password -->
+    <section id="password">
+      <h2 class="text-lg font-semibold text-[var(--greek-blue)] mb-3">Change Password</h2>
+      <form action="{% url 'change_password' %}" method="post" class="space-y-4">
+        {% csrf_token %}
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Current Password</label>
+          <input type="password" name="old_password" required 
+                 class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-[var(--greek-gold)]">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">New Password</label>
+          <input type="password" name="new_password1" required 
+                 class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-[var(--greek-gold)]">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+          <input type="password" name="new_password2" required 
+                 class="w-full rounded-lg border border-gray-300 p-2 focus:ring-2 focus:ring-[var(--greek-gold)]">
+        </div>
+        <button type="submit"
+                class="px-5 py-2 bg-[var(--greek-gold)] text-[var(--greek-blue)] rounded-lg shadow hover:opacity-90 transition">
+          Update Password
+        </button>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock content %}

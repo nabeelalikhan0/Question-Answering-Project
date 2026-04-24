@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fdfbf7;
+  --foreground: #1a1a1d;
+  --primary: #d4af37;
+  --primary-foreground: #ffffff;
+  --secondary: #2c5f2d;
+  --secondary-foreground: #ffffff;
+  --accent: #005f73;
+  --accent-foreground: #ffffff;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --card: #ffffff;
+  --card-foreground: #1a1a1d;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #d4af37;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --primary: #d4af37;
+  --primary-foreground: #1e293b;
+  --secondary: #2c5f2d;
+  --secondary-foreground: #f8fafc;
+  --accent: #0ea5e9;
+  --accent-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --border: #334155;
+  --input: #334155;
+  --ring: #d4af37;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-gradient: gradient 15s ease infinite;
+  --animate-scroll: scroll 20s linear infinite;
+
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-xl;
+  }
+  
+  .dark .glass {
+    @apply bg-black/40 backdrop-blur-lg border border-white/10 shadow-2xl;
+  }
+
+  .gold-gradient {
+    @apply bg-gradient-to-r from-[#b8860b] via-[#d4af37] to-[#b8860b] bg-clip-text text-transparent animate-shimmer font-bold;
+    background-size: 200% auto;
+  }
+  
+  .dark .gold-gradient {
+    @apply from-[#d4af37] via-[#f9e29c] to-[#d4af37];
+  }
+
+  .ancient-scroll {
+    background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+    @apply bg-[#fdf3e7] dark:bg-[#111827];
+  }
+
+  .marble-texture {
+    background-image: url('https://www.transparenttextures.com/patterns/marble.png');
+    @apply bg-[#fdfaf6] dark:bg-[#0f172a];
+  }
+}
